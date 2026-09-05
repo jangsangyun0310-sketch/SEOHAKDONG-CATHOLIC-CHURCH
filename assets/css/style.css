@@ -1,0 +1,2028 @@
+/* ==========================================================================
+   서학동성당 홈페이지 — 공통 스타일
+   컨셉: 로고의 첨탑 청록·전주천 파랑·한옥마을 모래빛을 그대로 담은 팔레트
+   ========================================================================== */
+
+:root {
+  --color-wine: #0e6b63;        /* 첨탑 청록 — 메인 포인트, 로고 건물 색 */
+  --color-wine-dark: #084b45;
+  --color-sage: #1c7fa8;        /* 전주천 파랑 — 로고 물결 색 */
+  --color-sage-light: #dcedf5;
+  --color-gold: #b9986b;        /* 한옥마을 모래빛 — 로고 산 색 */
+  --color-gold-light: #efe3d0;
+  --color-terracotta: #a67c52;  /* 짙은 모래빛 — 온기 포인트 */
+  --color-terracotta-light: #f0e2ce;
+  --color-ivory: #fffdf9;
+  --color-ivory-deep: #fbf1e6;
+  --color-ink: #17222d;
+  --color-ink-soft: #5b6672;
+  --color-line: #e7e1d6;
+  --color-sumi: #1c1a17;         /* 먹색 — 붓글씨 잉크 블랙 */
+  --color-sumi-soft: rgba(28, 26, 23, .5);
+  --shadow-soft: 0 12px 28px rgba(43, 38, 32, 0.07);
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --font-brush: "Song Myung", "Noto Serif KR", serif; /* 붓글씨·한지 느낌의 전주 포인트 서체 */
+  --font-serif: "Song Myung", "Noto Serif KR", "Nanum Myeongjo", serif;
+  --font-sans: "Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.72 0 0 0 0 0.62 0 0 0 0 0.42 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
+    repeat, var(--color-ivory);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--color-ink);
+  margin: 0 0 .5em;
+  line-height: 1.3;
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.container {
+  width: 100%;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section {
+  padding: 72px 0;
+}
+
+.section--tight {
+  padding: 48px 0;
+}
+
+.section--alt {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.72 0 0 0 0 0.62 0 0 0 0 0.42 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")
+    repeat, var(--color-ivory-deep);
+}
+
+.section-head {
+  position: relative;
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 40px;
+}
+
+.section-head::before {
+  content: "";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  width: 220px;
+  height: 140px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, var(--color-sumi-soft), transparent 70%);
+  filter: blur(12px);
+  opacity: .05;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  letter-spacing: .18em;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.section-head h2 {
+  font-size: clamp(24px, 3vw, 32px);
+}
+
+.section-desc {
+  color: var(--color-ink-soft);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 15px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.btn--primary {
+  background: var(--color-wine);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--color-wine-dark);
+  transform: translateY(-1px);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: rgba(255,255,255,.6);
+  color: #fff;
+}
+
+.btn--ghost:hover {
+  background: rgba(255,255,255,.12);
+}
+
+.btn--outline {
+  background: transparent;
+  border-color: var(--color-wine);
+  color: var(--color-wine);
+}
+
+.btn--outline:hover {
+  background: var(--color-wine);
+  color: #fff;
+}
+
+/* ---------- 안내 배지(준비중 등) ---------- */
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: .02em;
+}
+
+.badge--todo {
+  background: #f4e3c4;
+  color: #7a5714;
+}
+
+.placeholder-note {
+  margin-top: 8px;
+  font-size: 13.5px;
+  color: #8a6d2f;
+  background: #fbf1dc;
+  border: 1px dashed #d9b96f;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+
+.placeholder-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 220px;
+  border-radius: var(--radius-lg);
+  background:
+    repeating-linear-gradient(135deg, var(--color-terracotta-light), var(--color-terracotta-light) 14px, var(--color-sage-light) 14px, var(--color-sage-light) 28px);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-soft);
+  color: var(--color-ink-soft);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 20px;
+}
+
+/* ---------- 헤더 / 내비게이션 ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(250, 246, 239, .92);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.site-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 5px;
+  background: linear-gradient(90deg, transparent, var(--color-sumi-soft) 18%, transparent 38%, transparent 62%, var(--color-sumi-soft) 84%, transparent);
+  opacity: .12;
+  pointer-events: none;
+}
+
+.nav-bar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  padding: 18px 0;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 19px;
+  color: var(--color-wine-dark);
+}
+
+.brand-mark {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, var(--color-gold-light), var(--color-gold));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.brand-logo {
+  height: 80px;
+  width: auto;
+  display: block;
+  mix-blend-mode: multiply;
+}
+
+@media (max-width: 640px) {
+  .brand-logo { height: 52px; }
+}
+
+.brand-text small {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 11.5px;
+  color: var(--color-ink-soft);
+  letter-spacing: .02em;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-menu > li {
+  position: relative;
+}
+
+.nav-menu > li > a {
+  display: block;
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 16.5px;
+  border-radius: 999px;
+  color: var(--color-ink);
+}
+
+.nav-menu > li > a:hover,
+.nav-menu > li.is-active > a {
+  color: var(--color-wine);
+  background: var(--color-ivory-deep);
+}
+
+.nav-cta {
+  display: none;
+}
+
+.nav-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: #fff;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.nav-toggle span,
+.nav-toggle span::before,
+.nav-toggle span::after {
+  content: "";
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--color-wine-dark);
+  position: relative;
+  transition: transform .2s ease;
+}
+
+.nav-toggle span::before { position: absolute; top: -6px; }
+.nav-toggle span::after { position: absolute; top: 6px; }
+
+@media (min-width: 861px) {
+  .nav-cta { display: inline-flex; }
+}
+
+@media (max-width: 860px) {
+  .nav-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--color-ivory);
+    flex-direction: column;
+    border-bottom: 1px solid var(--color-line);
+    box-shadow: var(--shadow-soft);
+    padding: 8px;
+    display: none;
+  }
+  .nav-menu.is-open { display: flex; }
+  .nav-menu > li > a { padding: 14px 12px; }
+  .nav-toggle { display: flex; }
+}
+
+/* ---------- 바로가기 알약버튼 ---------- */
+.quicklinks-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  align-items: center;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.quicklinks-row::-webkit-scrollbar { display: none; }
+
+.pill-link {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+  transition: border-color .15s ease, color .15s ease, transform .15s ease;
+}
+
+.pill-link:hover {
+  border-color: var(--color-wine);
+  color: var(--color-wine);
+  transform: translateY(-1px);
+}
+
+.pill-ico {
+  width: 17px;
+  height: 17px;
+  object-fit: contain;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+/* ---------- 오늘의 미사 스트립 ---------- */
+.liturgy-strip {
+  background: #fff;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.liturgy-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 24px;
+}
+
+.liturgy-date {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+}
+
+.liturgy-month {
+  font-size: 11px;
+  color: var(--color-ink-soft);
+  font-weight: 700;
+}
+
+.liturgy-day {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-wine);
+}
+
+.liturgy-text {
+  flex: 1;
+  font-size: 14px;
+  color: var(--color-ink-soft);
+}
+
+.liturgy-cta {
+  flex-shrink: 0;
+  padding: 8px 18px;
+  font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .liturgy-text { display: none; }
+}
+
+/* ---------- 히어로 ---------- */
+.hero {
+  position: relative;
+  color: var(--color-ink);
+  padding: 96px 0 76px;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(14,107,99,.22), transparent 45%),
+    radial-gradient(circle at 6% 92%, rgba(28,127,168,.24), transparent 42%),
+    linear-gradient(160deg, rgba(255,249,240,.93), rgba(253,243,228,.88) 55%, rgba(247,236,216,.92)),
+    url("https://images.unsplash.com/photo-1653230675261-fe00bde32c8e?w=1600&q=70&auto=format&fit=crop") center / cover no-repeat;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -60px;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14,107,99,.14), transparent 70%);
+  pointer-events: none;
+}
+
+.hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 40px;
+  align-items: end;
+  padding-top: 8px;
+}
+
+.hero-inner {
+  max-width: 560px;
+}
+
+.hero-facts-panel {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 253, 249, .88);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, .6);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 40px rgba(23, 34, 45, .12);
+  padding: 8px 28px;
+}
+
+.hero-facts-title {
+  padding: 18px 0 14px;
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-wine);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.hero-fact-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--color-line);
+}
+
+.hero-fact-cell:first-of-type {
+  border-top: none;
+}
+
+.hero-fact-cell:last-child {
+  padding-bottom: 20px;
+}
+
+.hero-fact-cell span {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  flex-shrink: 0;
+}
+
+.hero-fact-cell strong {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-ink);
+  line-height: 1.3;
+  text-align: right;
+}
+
+.hero-mass-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--color-line);
+}
+
+.hero-mass-row:first-of-type {
+  border-top: none;
+}
+
+.hero-mass-row span {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+  flex-shrink: 0;
+}
+
+.hero-mass-row strong {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-wine);
+  text-align: right;
+  line-height: 1.25;
+}
+
+.hero-mass-row strong small {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  margin-top: 2px;
+}
+
+.hero-mass-weekday {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding: 18px 0;
+  border-top: 1px solid var(--color-line);
+}
+
+.hero-mass-weekday div {
+  text-align: center;
+}
+
+.hero-mass-weekday span {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  margin-bottom: 4px;
+}
+
+.hero-mass-weekday strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.hero-mass-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-mass-contact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  margin-top: 16px;
+  padding: 0 28px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--color-ink);
+  text-align: center;
+}
+
+
+.hero-fact-sub {
+  flex-basis: 100%;
+  margin-top: -4px;
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--color-ink-soft);
+  line-height: 1.4;
+}
+
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 28px; align-items: stretch; }
+  .hero-inner { max-width: none; }
+}
+
+.hero .eyebrow {
+  color: var(--color-wine);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* 낙관(도장) 스탬프 — 붓글씨 포인트 */
+.seal {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: var(--color-wine);
+  color: #fff;
+  font-family: var(--font-brush);
+  font-size: 13px;
+  letter-spacing: -.05em;
+  transform: rotate(-6deg);
+  box-shadow: 0 4px 10px rgba(193, 75, 42, .35);
+  flex-shrink: 0;
+}
+
+.seal::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  background: var(--color-sumi);
+  opacity: .14;
+  border-radius: 7px;
+  transform: rotate(6deg);
+  z-index: -1;
+}
+
+/* 부채(합죽선) 워터마크 */
+.hero-fan {
+  position: absolute;
+  top: -40px;
+  right: -20px;
+  width: 420px;
+  height: 420px;
+  opacity: .16;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (max-width: 700px) {
+  .hero-fan { width: 280px; height: 280px; top: -20px; right: -40px; }
+}
+
+/* 먹빛 배경 글자 워터마크 */
+.ink-mark {
+  position: absolute;
+  z-index: 0;
+  left: -0.06em;
+  bottom: -0.22em;
+  font-family: var(--font-brush);
+  font-size: clamp(220px, 32vw, 420px);
+  line-height: 1;
+  color: var(--color-sumi);
+  opacity: .05;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  transform: rotate(-3deg);
+}
+
+/* 먹 번짐(잉크 워시) */
+.ink-wash {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color-sumi-soft), transparent 68%);
+  filter: blur(10px);
+  opacity: .06;
+  pointer-events: none;
+}
+
+.hero h1 {
+  color: var(--color-ink);
+  font-size: clamp(40px, 7.5vw, 68px);
+  margin-bottom: 18px;
+}
+
+.hero .hero-quote {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: clamp(16px, 3.3vw, 32px);
+  line-height: 1.35;
+  color: var(--color-wine);
+  margin-bottom: 22px;
+}
+
+.hero p {
+  color: var(--color-ink-soft);
+  font-size: 18.5px;
+  max-width: 600px;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 30px;
+}
+
+.hero-actions .btn {
+  padding: 15px 30px;
+  font-size: 16px;
+}
+
+.hero-facts {
+  position: relative;
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.hero-facts div {
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.hero-facts strong {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  color: var(--color-wine);
+}
+
+.hero-facts span {
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- 미사시간 바 ---------- */
+.mass-strip {
+  background: var(--color-wine-dark);
+  color: #fff;
+}
+
+.mass-strip .container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 28px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+.mass-strip-title {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-gold-light);
+  white-space: nowrap;
+}
+
+.mass-strip ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+  font-size: 14.5px;
+}
+
+.mass-strip li b {
+  color: var(--color-gold-light);
+  margin-right: 6px;
+}
+
+.mass-strip a.btn {
+  margin-left: auto;
+  padding: 9px 18px;
+  font-size: 13.5px;
+}
+
+/* ---------- 카드 그리드 ---------- */
+.grid {
+  display: grid;
+  gap: 24px;
+}
+
+.grid--3 { grid-template-columns: repeat(3, 1fr); }
+.grid--2 { grid-template-columns: repeat(2, 1fr); }
+.grid--4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 900px) {
+  .grid--3, .grid--4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .grid--2, .grid--3, .grid--4 { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  padding: 28px 26px;
+  box-shadow: var(--shadow-soft);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 34px rgba(43, 38, 32, .1);
+}
+
+.card h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.card p {
+  color: var(--color-ink-soft);
+  font-size: 14.5px;
+}
+
+.icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(150deg, var(--color-terracotta-light), var(--color-gold-light));
+  color: var(--color-wine-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+  margin-bottom: 16px;
+}
+
+.icon-circle--sage {
+  background: linear-gradient(150deg, var(--color-sage-light), #eef6ef);
+  color: var(--color-sage);
+}
+
+/* ---------- 타임라인 ---------- */
+.timeline {
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+  padding-left: 28px;
+  border-left: 2px solid var(--color-line);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 34px;
+}
+
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -34px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  border: 3px solid var(--color-ivory);
+  box-shadow: 0 0 0 2px var(--color-gold);
+}
+
+.timeline-year {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--color-wine);
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.timeline-item p {
+  color: var(--color-ink-soft);
+  font-size: 14.5px;
+  margin-bottom: 0;
+}
+
+/* ---------- 표 ---------- */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: 14.5px;
+}
+
+th, td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-line);
+}
+
+th {
+  background: var(--color-ivory-deep);
+  color: var(--color-wine-dark);
+  font-family: var(--font-serif);
+  font-weight: 700;
+}
+
+tr:last-child td { border-bottom: none; }
+
+/* ---------- 서브 페이지 히어로(작은 배너) ---------- */
+.page-banner {
+  color: var(--color-ink);
+  padding: 58px 0 44px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(14,107,99,.14), transparent 50%),
+    radial-gradient(circle at 4% 100%, rgba(28,127,168,.16), transparent 45%),
+    linear-gradient(160deg, #fff9f0, #fbf1e2);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.page-banner .container { position: relative; }
+
+.breadcrumb {
+  font-size: 13px;
+  color: var(--color-wine);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.page-banner h1 {
+  color: var(--color-ink);
+  font-size: clamp(26px, 4vw, 36px);
+  margin-bottom: 8px;
+}
+
+.page-banner p {
+  color: var(--color-ink-soft);
+  max-width: 560px;
+  margin-bottom: 0;
+}
+
+/* ---------- 갤러리 ---------- */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.gallery-year-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 28px;
+  justify-content: center;
+}
+
+.gallery-thumb {
+  aspect-ratio: 4/5;
+  min-height: 0;
+}
+
+.gallery-cap {
+  margin-top: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.gallery-cap-date {
+  font-size: 11.5px;
+  color: var(--color-ink-soft);
+  letter-spacing: .03em;
+}
+
+.gallery-cap-title {
+  font-size: 13px;
+  color: var(--color-ink);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.placeholder-photo--photo {
+  position: relative;
+  padding: 0;
+  background: none;
+  overflow: hidden;
+}
+
+.placeholder-photo--photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-thumb:hover { transform: scale(1.03); }
+.gallery-thumb { transition: transform .2s ease; }
+
+@media (max-width: 900px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
+
+/* ---------- 공지/게시판 아코디언 ---------- */
+.notice-list {
+  border-top: 1px solid var(--color-ink);
+}
+
+.notice-item {
+  border-bottom: 1px solid var(--color-line);
+}
+
+.notice-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 18px 4px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.notice-tag {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-wine);
+  background: var(--color-ivory-deep);
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.notice-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.notice-date {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+.notice-plus {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  position: relative;
+}
+
+.notice-plus::before,
+.notice-plus::after {
+  content: "";
+  position: absolute;
+  background: var(--color-ink-soft);
+  transition: transform .2s ease, opacity .2s ease;
+}
+
+.notice-plus::before { left: 0; top: 50%; width: 100%; height: 2px; transform: translateY(-50%); }
+.notice-plus::after { top: 0; left: 50%; width: 2px; height: 100%; transform: translateX(-50%); }
+
+.notice-item.open .notice-plus::after { transform: translateX(-50%) rotate(90deg); opacity: 0; }
+
+.notice-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .25s ease;
+}
+
+.notice-body-inner {
+  padding: 0 4px 20px;
+  color: var(--color-ink-soft);
+  font-size: 14px;
+  max-width: 70ch;
+}
+
+/* ---------- 미사시간 탭 ---------- */
+.mass-tabs {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.mass-tab {
+  padding: 10px 24px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.mass-tab.active {
+  background: var(--color-wine);
+  border-color: var(--color-wine);
+  color: #fff;
+}
+
+.mass-panel { display: none; }
+.mass-panel.active { display: block; }
+
+/* ---------- 갤러리 라이트박스 ---------- */
+.gallery-item {
+  border: none;
+  padding: 0;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(24, 20, 16, .82);
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.lightbox.open { display: flex; }
+
+.lightbox-inner {
+  max-width: 560px;
+  width: 100%;
+  background: #fff;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.lightbox-img.placeholder-photo {
+  border-radius: 0;
+  aspect-ratio: 4/3;
+  min-height: 0;
+  border: none;
+  transform: none;
+}
+
+.lightbox-cap {
+  padding: 16px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.lightbox-close {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--color-ink);
+  background: none;
+  cursor: pointer;
+}
+
+/* ---------- 한옥마을 오시는 길 카드 ---------- */
+.route-card {
+  display: flex;
+  gap: 16px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-soft);
+}
+
+.route-steps {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 13.5px;
+  color: var(--color-ink-soft);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.route-steps::-webkit-scrollbar { display: none; }
+
+.route-steps .step {
+  flex-shrink: 0;
+  background: var(--color-ivory-deep);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.route-steps .arrow { flex-shrink: 0; }
+
+.route-steps .arrow { color: var(--color-line); font-weight: 700; }
+
+/* ---------- 정보 목록 (본당 개요 표) ---------- */
+.info-list dl {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 12px 0;
+}
+
+.info-list dt {
+  color: var(--color-ink-soft);
+  font-weight: 600;
+}
+
+.info-list dd {
+  margin: 0;
+}
+
+/* ---------- 지도 자리 ---------- */
+.map-box {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  height: 360px;
+}
+
+.map-box iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+/* ---------- 실사진 타일 ---------- */
+.photo-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.photo-tile {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--color-line);
+}
+
+.photo-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .35s ease;
+}
+
+.photo-tile:hover img {
+  transform: scale(1.05);
+}
+
+.photo-cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(0deg, rgba(20,16,12,.6), transparent);
+}
+
+.photo-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(20, 16, 12, .6);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: .02em;
+}
+
+@media (max-width: 700px) {
+  .photo-strip { grid-template-columns: 1fr; }
+}
+
+/* ---------- 인사말 사진 ---------- */
+/* ---------- 본당소개 핵심 정보 스트립 ---------- */
+.intro-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 760px;
+  margin: 0 auto 56px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.intro-stats div {
+  padding: 22px 16px;
+  text-align: center;
+  border-left: 1px solid var(--color-line);
+}
+
+.intro-stats div:first-child {
+  border-left: none;
+}
+
+.intro-stats strong {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--color-wine);
+  margin-bottom: 4px;
+}
+
+.intro-stats span {
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+}
+
+.intro-info-list {
+  margin-top: 32px;
+  border-top: 1px solid var(--color-line);
+}
+
+/* ---------- 본당소개 인용구 · 사진 ---------- */
+/* 말씀 인용 제목 — 섹션 헤드 공통 (본당소개 · 공지사항 등) */
+/* 섹션 제목(메인, 크게)의 보조 성구 — 라벨보다 작게 */
+.verse-sub {
+  margin-top: 10px;
+  font-family: var(--font-serif);
+  font-size: clamp(17px, 2vw, 20px);
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.verse-cite-inline {
+  display: inline-block;
+  margin-left: 4px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-wine);
+}
+
+.intro-photo {
+  aspect-ratio: 4/3;
+  min-height: 0;
+}
+
+/* ---------- 역대 주임신부 · 본당 출신 신부님 (용머리성당 참고 구조) ---------- */
+.pastor-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 22px;
+  border-top: 1px solid var(--color-ink);
+  padding-top: 24px;
+}
+
+.pastor-list li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  text-align: center;
+}
+
+.pastor-photo {
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-ivory-deep);
+  border: 1px solid var(--color-line);
+}
+
+.pastor-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.pastor-photo.placeholder-photo {
+  min-height: 0;
+  font-size: 10px;
+  padding: 4px;
+}
+
+.pastor-list .gen {
+  font-size: 12px;
+  color: var(--color-gold);
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+
+.pastor-list .pname {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.pastor-list .pdate {
+  font-size: 12px;
+  color: var(--color-ink-soft);
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .pastor-list { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+}
+
+.intro-info-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.intro-info-row span {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  flex-shrink: 0;
+}
+
+.intro-info-row strong {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--color-ink);
+  text-align: right;
+}
+
+.intro-info-sub {
+  flex-basis: 100%;
+  margin-top: -4px;
+  text-align: right;
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+}
+
+.priest-block {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.priest-block--centered {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 28px;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.priest-photo {
+  flex-shrink: 0;
+  width: 140px;
+  aspect-ratio: 3/4;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-soft);
+}
+
+.priest-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.priest-bio {
+  padding-top: 2px;
+}
+
+.priest-caption {
+  margin: 0 0 12px;
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-wine);
+}
+
+.priest-bio-list {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 9px 0;
+}
+
+.priest-bio-list dt {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.priest-bio-list dd {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+
+.priest-bio-list dd small {
+  color: var(--color-ink-soft);
+  font-size: 11.5px;
+}
+
+@media (max-width: 560px) {
+  .priest-block { flex-direction: column; }
+  .priest-photo { width: 120px; }
+}
+
+/* ---------- 주보 아카이브 (용머리성당 참고 구조) ---------- */
+.bulletin-latest {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  background: var(--color-ivory-deep);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  margin-bottom: 28px;
+}
+
+.bulletin-year-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.year-tab {
+  padding: 8px 16px;
+  font-size: 13.5px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--color-ink-soft);
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.year-tab.active {
+  background: var(--color-wine);
+  border-color: var(--color-wine);
+  color: #fff;
+}
+
+.year-tab:disabled {
+  opacity: .4;
+  cursor: default;
+}
+
+.bulletin-week-list {
+  border-top: 1px solid var(--color-ink);
+}
+
+.bulletin-empty-note {
+  padding: 28px 4px;
+  color: var(--color-ink-soft);
+  font-size: 13.5px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+/* ---------- 오시는 길: 지도 캡션 · 범례 · 연락처 (용머리성당 참고 구조) ---------- */
+.loc-map {
+  min-height: 420px;
+}
+
+
+.loc-map-caption {
+  margin: 14px 0 0;
+  padding: 12px 18px;
+  background: var(--color-ivory-deep);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  text-align: center;
+}
+
+.directions-link {
+  margin-left: 8px;
+  color: var(--color-wine);
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.map-legend {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  flex-wrap: wrap;
+}
+
+.map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.map-legend i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.contact-list--row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+  padding-top: 32px;
+  border-top: 1px solid var(--color-ink);
+}
+
+.contact-list li {
+  display: flex;
+  gap: 12px;
+}
+
+.contact-list svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  color: var(--color-wine);
+}
+
+.contact-list .label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-ink-soft);
+  margin-bottom: 3px;
+}
+
+.contact-list .value {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+@media (max-width: 860px) {
+  .contact-list--row { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------- 계보 다이어그램 (모본당 → 분가 본당) ---------- */
+.lineage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.lineage-root {
+  background: var(--color-wine);
+  color: #fff;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  padding: 16px 30px;
+  border-radius: 999px;
+  font-size: 17px;
+  box-shadow: var(--shadow-soft);
+}
+
+.lineage-root span {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--color-gold-light);
+  margin-top: 2px;
+}
+
+.lineage-branches {
+  position: relative;
+  width: 100%;
+  margin-top: 6px;
+  padding-top: 34px;
+}
+
+.lineage-branches::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12.5%;
+  right: 12.5%;
+  height: 2px;
+  background: var(--color-line);
+}
+
+.lineage-branches ul {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.lineage-branches li {
+  position: relative;
+  text-align: center;
+  padding-top: 20px;
+}
+
+.lineage-branches li::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  width: 2px;
+  height: 20px;
+  background: var(--color-line);
+}
+
+.lineage-branches li::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-terracotta);
+}
+
+.lineage-branches .card {
+  padding: 16px 10px;
+}
+
+.lineage-branches b {
+  display: block;
+  font-family: var(--font-serif);
+  color: var(--color-wine);
+  font-size: 15px;
+  margin-bottom: 3px;
+}
+
+.lineage-year {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--color-sage);
+  margin-bottom: 6px;
+}
+
+.lineage-branches small {
+  color: var(--color-ink-soft);
+  font-size: 12.5px;
+}
+
+@media (max-width: 700px) {
+  .lineage-branches ul { grid-template-columns: repeat(2, 1fr); gap: 20px 12px; }
+}
+
+/* ---------- 말씀산행 오솔길 모티프 ---------- */
+.trail {
+  position: relative;
+  padding-left: 6px;
+}
+
+.trail-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 28px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.trail-step {
+  flex: 1;
+  min-width: 96px;
+  text-align: center;
+  position: relative;
+}
+
+.trail-step .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-ivory);
+  border: 2px solid var(--color-gold);
+  margin: 0 auto 8px;
+}
+
+.trail-step.is-now .dot {
+  background: var(--color-terracotta);
+  border-color: var(--color-terracotta);
+  box-shadow: 0 0 0 5px var(--color-terracotta-light);
+}
+
+.trail-step-label {
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+  font-weight: 600;
+}
+
+.trail-connector {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--color-gold) 0 6px, transparent 6px 10px);
+  margin-top: -22px;
+}
+
+.stat-strip {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 26px;
+}
+
+.stat-strip div {
+  text-align: center;
+}
+
+.stat-strip strong {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: var(--color-terracotta);
+}
+
+.stat-strip span {
+  font-size: 13px;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- 펼쳐보기(details) ---------- */
+.toggle-box {
+  margin-top: 30px;
+}
+
+.toggle-box summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14.5px;
+  color: var(--color-wine);
+  list-style: none;
+}
+
+.toggle-box summary::-webkit-details-marker { display: none; }
+.toggle-box summary::after { content: " ▾"; }
+.toggle-box[open] summary::after { content: " ▴"; }
+.toggle-box .toggle-content { margin-top: 24px; }
+
+/* ---------- 인용/성구 ---------- */
+.scripture-quote {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto;
+  font-family: var(--font-serif);
+  font-size: clamp(19px, 2.4vw, 24px);
+  color: var(--color-wine-dark);
+  line-height: 1.6;
+}
+
+.scripture-quote cite {
+  display: block;
+  margin-top: 14px;
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-size: 14px;
+  color: var(--color-ink-soft);
+}
+
+/* ---------- 푸터 ---------- */
+.site-footer {
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 30px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.045) 0 1px, transparent 1px 30px),
+    var(--color-ink);
+  color: rgba(255,255,255,.75);
+  padding: 56px 0 28px;
+  margin-top: 40px;
+  position: relative;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+
+.footer-grid h4 {
+  color: #fff;
+  font-size: 15px;
+  margin-bottom: 14px;
+}
+
+.footer-grid p, .footer-grid li {
+  font-size: 13.5px;
+  color: rgba(255,255,255,.65);
+}
+
+.footer-grid li { margin-bottom: 8px; }
+.footer-grid li a:hover { color: var(--color-gold-light); }
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.footer-bottom {
+  padding-top: 20px;
+  font-size: 12.5px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: rgba(255,255,255,.45);
+}
+
+@media (max-width: 760px) {
+  .footer-grid { grid-template-columns: 1fr; }
+  .grid--3, .grid--4, .grid--2 { grid-template-columns: 1fr; }
+  .info-list dl { grid-template-columns: 100px 1fr; }
+}
