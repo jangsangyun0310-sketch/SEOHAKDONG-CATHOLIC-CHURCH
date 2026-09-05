@@ -33,10 +33,12 @@
 
 html {
   scroll-behavior: smooth;
+  overscroll-behavior-x: none;
 }
 
 body {
   margin: 0;
+  overscroll-behavior-x: none;
   font-family: var(--font-sans);
   color: var(--color-ink);
   background:
@@ -391,6 +393,8 @@ ul {
   align-items: center;
   max-width: 100%;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 
@@ -1257,9 +1261,15 @@ tr:last-child td { border-bottom: none; }
   font-weight: 600;
   cursor: pointer;
   box-shadow: var(--shadow-soft);
+  transition: opacity .18s ease, transform .18s ease;
 }
 
 .install-fab:hover { background: var(--color-wine-dark); }
+
+.install-fab.is-dimmed {
+  opacity: .32;
+  transform: scale(.94);
+}
 
 .install-fab svg { width: 17px; height: 17px; flex-shrink: 0; }
 
@@ -1349,6 +1359,7 @@ tr:last-child td { border-bottom: none; }
   font-size: 13.5px;
   color: var(--color-ink-soft);
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
