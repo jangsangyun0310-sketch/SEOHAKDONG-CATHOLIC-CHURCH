@@ -83,4 +83,22 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.target === lightbox) lightbox.classList.remove("open");
     });
   }
+
+  // 카카오맵 — 오시는 길
+  const mapEl = document.getElementById("locMap");
+  if (mapEl && window.kakao && window.kakao.maps) {
+    kakao.maps.load(() => {
+      const geocoder = new kakao.maps.services.Geocoder();
+      const address = "전주시 완산구 서학로 51";
+      geocoder.addressSearch(address, (result, status) => {
+        const center =
+          status === kakao.maps.services.Status.OK
+            ? new kakao.maps.LatLng(result[0].y, result[0].x)
+            : new kakao.maps.LatLng(35.8074, 127.1489); // 주소 검색 실패 시 대략적 위치로 대체
+
+        const map = new kakao.maps.Map(mapEl, { center, level: 4 });
+        new kakao.maps.Marker({ map, position: center, title: "서학동성당" });
+      });
+    });
+  }
 });
