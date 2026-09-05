@@ -14,11 +14,23 @@
 <meta property="og:image" content="https://jangsangyun0310-sketch.github.io/SEOHAKDONG-CATHOLIC-CHURCH/assets/img/og-logo.png">
 <meta property="og:image:width" content="1254">
 <meta property="og:image:height" content="1254">
+
+<!-- 홈 화면에 추가(PWA) -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e6b63">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/icons/icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/img/icons/icon-16.png">
+<link rel="apple-touch-icon" href="assets/img/icons/icon-180.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="서학동성당">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
-<link rel="stylesheet" href="assets/css/style.css?v=202609062">
+<link rel="stylesheet" href="assets/css/style.css?v=202609063">
 </head>
 <body id="top">
 
@@ -379,6 +391,11 @@
         <div><span class="label">팩스</span><span class="value">063-232-9009</span></div>
       </li>
     </ul>
+
+    <div class="qr-card">
+      <img src="assets/img/site-qr.png" alt="서학동성당 홈페이지 QR코드" width="140" height="140">
+      <p>휴대폰 카메라로 QR코드를 찍으면<br>홈페이지로 바로 연결됩니다.</p>
+    </div>
   </div>
 </section>
 
@@ -392,7 +409,115 @@
   </div>
 </div>
 
+<button type="button" class="install-fab" id="installAppBtn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+  홈 화면에 추가
+</button>
+
+<div class="install-modal" id="installModal">
+  <div class="install-modal-inner">
+    <div class="install-modal-head">
+      <strong>홈 화면에 추가하기</strong>
+      <button class="lightbox-close" id="installModalClose" aria-label="닫기">✕</button>
+    </div>
+    <div id="installGuideIOS" hidden>
+      <p class="install-guide-lead">아이폰(사파리)에서는 이렇게 해보세요.</p>
+      <ol class="install-steps">
+        <li><span class="install-step-num">1</span><span>화면 아래쪽의 <strong>공유 버튼</strong>(네모에서 위로 화살표 나가는 모양)을 눌러주세요.</span></li>
+        <li><span class="install-step-num">2</span><span>아래로 내려서 <strong>"홈 화면에 추가"</strong>를 찾아 눌러주세요.</span></li>
+        <li><span class="install-step-num">3</span><span>오른쪽 위 <strong>"추가"</strong>를 누르면 끝이에요.</span></li>
+      </ol>
+    </div>
+    <div id="installGuideAndroid" hidden>
+      <p class="install-guide-lead">안드로이드에서는 이렇게 해보세요.</p>
+      <ol class="install-steps">
+        <li><span class="install-step-num">1</span><span>화면 위쪽이나 아래쪽에 있는 <strong>점 3개(⋮) 또는 줄 3개(≡) 메뉴 버튼</strong>을 찾아 눌러주세요.</span></li>
+        <li><span class="install-step-num">2</span><span>메뉴 목록에서 <strong>"홈 화면에 추가"</strong> 또는 <strong>"앱 설치"</strong>라고 쓰인 것을 찾아 눌러주세요.</span></li>
+        <li><span class="install-step-num">3</span><span><strong>"추가"</strong>를 누르면 끝이에요.</span></li>
+      </ol>
+    </div>
+    <div id="installGuideInApp" hidden>
+      <p class="install-guide-lead">카카오톡 화면 안에서는 설치가 안 돼요. 이렇게 해보세요.</p>
+      <ol class="install-steps">
+        <li><span class="install-step-num">1</span><span><strong>뒤로 가기</strong>를 눌러 대화방(채팅방)으로 돌아가주세요.</span></li>
+        <li><span class="install-step-num">2</span><span>이 링크(주소)를 손가락으로 <strong>길게(꾹) 눌러주세요</strong>.</span></li>
+        <li><span class="install-step-num">3</span><span>나오는 메뉴에서 <strong>"다른 브라우저로 열기"</strong>(또는 "Chrome으로 열기")를 눌러주세요.</span></li>
+        <li><span class="install-step-num">4</span><span>새로 열린 화면에서 이 버튼을 다시 한 번 눌러주세요.</span></li>
+      </ol>
+    </div>
+    <div id="installGuideGeneric" hidden>
+      <p class="install-guide-lead">사용 중인 브라우저의 메뉴를 열어 <strong>"홈 화면에 추가"</strong>를 눌러주세요.</p>
+    </div>
+    <p class="install-guide-note">한 번만 추가해두면, 다음부터는 휴대폰 화면의 아이콘을 눌러 앱처럼 바로 들어올 수 있어요.</p>
+  </div>
+</div>
+
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=cbcb370204a8f8c4a89fb47c6e001a5f&libraries=services&autoload=false"></script>
 <script src="assets/js/main.js"></script>
+<script>
+  // "홈 화면에 추가" — 신자분들이 앱처럼 바로 들어올 수 있도록 안내
+  (function () {
+    const installBtn = document.getElementById('installAppBtn');
+    const modal = document.getElementById('installModal');
+    if (!installBtn || !modal) return;
+
+    const alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (alreadyInstalled) { installBtn.remove(); return; }
+
+    function openModal() { modal.classList.add('open'); }
+    function closeModal() { modal.classList.remove('open'); }
+    document.getElementById('installModalClose').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    const ua = navigator.userAgent;
+    const isIOS = /iphone|ipad|ipod/i.test(ua);
+    const isAndroid = /android/i.test(ua);
+    // 카카오톡·네이버·인스타그램 등 앱 내장 브라우저는 자체 메뉴만 있어서
+    // "홈 화면에 추가"가 아예 없거나 다른 곳에 있는 경우가 많음
+    const isInApp = /kakaotalk|naver\(|instagram|fban|fbav|everytimeapp|band\//i.test(ua);
+
+    function showInstallGuide() {
+      document.getElementById('installGuideIOS').hidden = !(isIOS && !isInApp);
+      document.getElementById('installGuideAndroid').hidden = !(isAndroid && !isInApp);
+      document.getElementById('installGuideInApp').hidden = !isInApp;
+      document.getElementById('installGuideGeneric').hidden = isInApp || isIOS || isAndroid;
+      openModal();
+    }
+
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        return;
+      }
+      // 카카오톡 등 인앱 브라우저는 "홈 화면에 추가" 기능이 없어서,
+      // 안드로이드에서는 intent 스킴으로 실제 브라우저(크롬/삼성인터넷)로 먼저 튕겨나가도록 시도한다.
+      // 카카오톡이 이 스킴을 처리하지 못하면 화면 전환이 없으므로, 잠시 뒤 수동 안내로 대체한다.
+      if (isInApp && isAndroid) {
+        const bareUrl = location.href.replace(/^https?:\/\//, '');
+        const fallbackTimer = setTimeout(showInstallGuide, 1200);
+        document.addEventListener('visibilitychange', () => {
+          if (document.hidden) clearTimeout(fallbackTimer);
+        }, { once: true });
+        location.href = 'intent://' + bareUrl + '#Intent;scheme=https;end';
+        return;
+      }
+      showInstallGuide();
+    });
+  })();
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>

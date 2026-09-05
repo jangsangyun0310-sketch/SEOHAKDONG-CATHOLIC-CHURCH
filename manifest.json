@@ -1,0 +1,17 @@
+{
+  "name": "천주교 전주교구 서학동성당",
+  "short_name": "서학동성당",
+  "description": "1968년 설립, 예수·마리아·요셉의 성가정을 주보로 모시는 천주교 전주교구 서학동성당 공식 홈페이지입니다.",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fffdf9",
+  "theme_color": "#0e6b63",
+  "icons": [
+    { "src": "assets/img/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/img/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
