@@ -1418,6 +1418,7 @@ tr:last-child td { border-bottom: none; }
 .route-card {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 16px;
   background: #fff;
   border: 1px solid var(--color-line);
@@ -1428,7 +1429,7 @@ tr:last-child td { border-bottom: none; }
 }
 
 .route-card .route-steps {
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
   margin-top: 0;
   justify-content: center;
