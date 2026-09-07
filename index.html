@@ -146,8 +146,8 @@
     </div>
 
     <div>
-      <p class="section-desc">전동성당에서 분리된 서학동성당은<br>
-      1968년에 설립되어 예수·마리아·요셉의 성가정을<br>
+      <p class="section-desc">전동성당에서 분리된 서학동성당은 1968년에<br>
+      설립되어 예수·마리아·요셉의 성가정을<br>
       주보로 모시는 신앙공동체입니다.<br>
       전주 남부지역 복음화의 뿌리가 되어 온<br>
       우리 서학동본당은 말씀과 기도, 나눔을 통해<br>
@@ -356,21 +356,27 @@
       <p class="verse-sub">“목마른 사람은 다 나에게 와서 마셔라.” <span class="verse-cite-inline">요한복음 7장 37절</span></p>
     </div>
 
-    <div class="loc-map" id="locMap"></div>
+    <div class="loc-map" id="locMap">
+      <div class="loc-map-fallback" id="locMapFallback">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s7-7.2 7-12.5A7 7 0 0 0 5 9.5C5 14.8 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
+        <p>지도를 불러오지 못했어요.<br>아래 버튼으로 위치를 확인해 주세요.</p>
+        <a href="https://map.kakao.com/link/search/전주시 완산구 서학로 51 서학동성당" target="_blank" rel="noopener" class="btn btn--outline">카카오맵에서 열기</a>
+      </div>
+    </div>
     <p class="loc-map-caption">전주시 완산구 서학로 51 (우 55101) · 서학동성당</p>
     <div class="map-legend">
       <span><i style="background:var(--color-wine);"></i> 서학동성당</span>
       <span><i style="background:var(--color-sage);"></i> 전주 시내 다른 성당</span>
     </div>
 
-    <div class="route-card" style="margin-top:28px;">
-      <div class="route-steps" style="margin-top:0; justify-content:center;">
+    <div class="route-card">
+      <div class="route-steps">
         <span class="step">전동성당</span><span class="arrow">→</span>
         <span class="step">전주천 · 싸전다리</span><span class="arrow">→</span>
         <span class="step">동쪽으로 도보</span><span class="arrow">→</span>
         <span class="step">전주교대 맞은편 서학동성당</span>
       </div>
-      <div class="stat-strip" style="justify-content:center; margin-top:16px; gap:32px;">
+      <div class="stat-strip">
         <div><strong>약 0.8km</strong></div>
         <div><strong>도보 12분</strong></div>
       </div>
@@ -516,19 +522,16 @@
 
     // 스크롤하다 보면 버튼이 본문 글자 위에 겹칠 때가 있어, 그럴 때만 살짝 옅게 만든다
     const textTags = ['P', 'LI', 'DD', 'DT', 'TD', 'TH', 'BLOCKQUOTE', 'SPAN', 'STRONG', 'A', 'H1', 'H2', 'H3', 'H4'];
+    const isTextEl = (el) => el && (textTags.includes(el.tagName) || textTags.includes(el.parentElement?.tagName)) && el.textContent.trim().length > 0;
     let ticking = false;
     function updateDimState() {
       const r = installBtn.getBoundingClientRect();
-      const points = [
-        [r.left + 4, r.top + 4], [r.right - 4, r.top + 4],
-        [r.left + 4, r.bottom - 4], [r.right - 4, r.bottom - 4]
-      ];
+      const xs = [r.left + 4, r.left + r.width / 2, r.right - 4];
+      const ys = [r.top + 4, r.top + r.height / 2, r.bottom - 4];
+      const points = xs.flatMap((x) => ys.map((y) => [x, y]));
       const prevPE = installBtn.style.pointerEvents;
       installBtn.style.pointerEvents = 'none';
-      const overlapsText = points.some(([x, y]) => {
-        const el = document.elementFromPoint(x, y);
-        return el && textTags.includes(el.tagName) && el.textContent.trim().length > 0;
-      });
+      const overlapsText = points.some(([x, y]) => isTextEl(document.elementFromPoint(x, y)));
       installBtn.style.pointerEvents = prevPE;
       installBtn.classList.toggle('is-dimmed', overlapsText);
     }

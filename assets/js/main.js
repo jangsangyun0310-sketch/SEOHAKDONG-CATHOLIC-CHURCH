@@ -84,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
             ? new kakao.maps.LatLng(result[0].y, result[0].x)
             : new kakao.maps.LatLng(35.8074, 127.1489); // 주소 검색 실패 시 대략적 위치로 대체
 
+        mapEl.innerHTML = ""; // 지도가 정상 로드되면 안내 문구(fallback)를 지운다
         const map = new kakao.maps.Map(mapEl, { center, level: 4 });
         new kakao.maps.Marker({ map, position: center, title: "서학동성당" });
       });
