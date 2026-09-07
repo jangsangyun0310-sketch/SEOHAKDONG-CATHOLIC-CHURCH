@@ -16,18 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  // 오늘의 미사 날짜 · CBCK 링크
-  const today = new Date();
-  const yyyy = today.getFullYear();
-  const mm = String(today.getMonth() + 1).padStart(2, "0");
-  const dd = String(today.getDate()).padStart(2, "0");
-  const monthEl = document.getElementById("liturgyMonth");
-  const dayEl = document.getElementById("liturgyDay");
-  const linkEl = document.getElementById("liturgyLink");
-  if (monthEl) monthEl.textContent = yyyy + "." + mm;
-  if (dayEl) dayEl.textContent = dd;
-  if (linkEl) linkEl.href = "https://missa.cbck.or.kr/DailyMissa/" + yyyy + mm + dd;
-
   // 미사시간 탭 (주일 / 평일)
   document.querySelectorAll(".mass-tab").forEach((tab) => {
     tab.addEventListener("click", () => {

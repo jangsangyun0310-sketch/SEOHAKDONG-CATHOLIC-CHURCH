@@ -463,8 +463,42 @@ ul {
   color: var(--color-wine);
 }
 
+.liturgy-color {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-gold);
+  color: var(--color-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.liturgy-color[data-color="백"] { border-color: var(--color-gold); color: var(--color-gold); }
+.liturgy-color[data-color="홍"] { border-color: #a3384a; color: #a3384a; }
+.liturgy-color[data-color="녹"] { border-color: #3f6b4a; color: #3f6b4a; }
+.liturgy-color[data-color="자"] { border-color: #5b3a6e; color: #5b3a6e; }
+.liturgy-color[data-color="흑"] { border-color: var(--color-ink); color: var(--color-ink); }
+
 .liturgy-text {
   flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.liturgy-text strong {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.liturgy-text span {
+  margin-left: 10px;
   font-size: 14px;
   color: var(--color-ink-soft);
 }
@@ -476,7 +510,11 @@ ul {
 }
 
 @media (max-width: 640px) {
-  .liturgy-text { display: none; }
+  .liturgy-row { align-items: flex-start; gap: 12px; }
+  .liturgy-text { white-space: normal; }
+  .liturgy-text strong { display: block; font-size: 13.5px; }
+  .liturgy-text span { display: block; margin-left: 0; margin-top: 3px; font-size: 12.5px; line-height: 1.4; }
+  .liturgy-cta { align-self: center; font-size: 12px; padding: 6px 12px; }
 }
 
 /* ---------- 히어로 ---------- */

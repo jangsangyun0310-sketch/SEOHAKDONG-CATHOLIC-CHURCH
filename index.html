@@ -57,17 +57,22 @@
     <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false"><span></span></button>
   </div>
 
-  <!-- 오늘의 미사(전례) 스트립 -->
+  <!-- TODAYWORD:AUTO-UPDATED daily at 00:00 KST — edit only the text inside the id="liturgy*" tags below -->
   <div class="liturgy-strip">
     <div class="container liturgy-row">
       <div class="liturgy-date">
-        <span class="liturgy-month" id="liturgyMonth">--.--</span>
-        <span class="liturgy-day" id="liturgyDay">--</span>
+        <span class="liturgy-month" id="liturgyYm">2026.09</span>
+        <span class="liturgy-day" id="liturgyDay">07</span>
       </div>
-      <span class="liturgy-text" id="liturgyText">오늘의 미사 · 독서와 복음 말씀을 확인해 보세요</span>
-      <a href="https://missa.cbck.or.kr" target="_blank" rel="noopener" id="liturgyLink" class="btn btn--outline liturgy-cta">오늘의 미사 보기</a>
+      <div class="liturgy-color" id="liturgyColor" data-color="녹">녹</div>
+      <div class="liturgy-text">
+        <strong id="liturgyFeast">연중 제23주간 월요일</strong>
+        <span id="liturgyVerse">그들은 예수님께서 안식일에 병을 고쳐 주시는지 지켜보고 있었다. (루카 6,6-11)</span>
+      </div>
+      <a href="https://maria.catholic.or.kr/mobile/missa/missa_view.asp?today=on" target="_blank" rel="noopener" class="btn btn--outline liturgy-cta">오늘의 미사 보기</a>
     </div>
   </div>
+  <!-- /TODAYWORD -->
 </header>
 
 <!-- 히어로 -->
