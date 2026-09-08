@@ -11,7 +11,6 @@
   if (!supported) { bellBtns.forEach((b) => b.remove()); return; }
 
   const DISMISSED_KEY = 'seohakdong-dismissed-notifs';
-  const LAST_VIEWED_KEY = 'seohakdong-notif-last-viewed';
 
   function getDismissed() {
     try { return new Set(JSON.parse(localStorage.getItem(DISMISSED_KEY) || '[]')); }
@@ -21,9 +20,6 @@
     const set = getDismissed();
     set.add(id);
     localStorage.setItem(DISMISSED_KEY, JSON.stringify([...set]));
-  }
-  function getLastViewed() {
-    return Number(localStorage.getItem(LAST_VIEWED_KEY) || 0);
   }
 
   function getFirebaseApp() {
@@ -59,6 +55,7 @@
       delBtn.addEventListener('click', () => {
         addDismissed(it.id);
         renderList();
+        updateBadge();
       });
       li.appendChild(body);
       li.appendChild(delBtn);
@@ -66,15 +63,15 @@
     });
   }
 
+  // 배지 숫자 = 지우지 않고 알림함에 남아있는 알림 개수 (읽었는지 여부와 무관)
   function updateBadge() {
     const dismissed = getDismissed();
-    const lastViewed = getLastViewed();
-    const unreadCount = items.filter((it) => !dismissed.has(it.id) && it.createdAt && it.createdAt.getTime() > lastViewed).length;
+    const remaining = items.filter((it) => !dismissed.has(it.id)).length;
     bellBtns.forEach((b) => {
       const badge = b.querySelector('.notif-bell-badge');
       if (!badge) return;
-      badge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
-      badge.hidden = unreadCount === 0;
+      badge.textContent = remaining > 9 ? '9+' : String(remaining);
+      badge.hidden = remaining === 0;
     });
   }
 
@@ -103,11 +100,6 @@
   function openPanel() {
     renderList();
     panel.classList.add('open');
-    localStorage.setItem(LAST_VIEWED_KEY, String(Date.now()));
-    bellBtns.forEach((b) => {
-      const badge = b.querySelector('.notif-bell-badge');
-      if (badge) badge.hidden = true;
-    });
   }
   function closePanel() { panel.classList.remove('open'); }
 
