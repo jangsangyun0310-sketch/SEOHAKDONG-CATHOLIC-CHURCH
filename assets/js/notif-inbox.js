@@ -73,6 +73,13 @@
       badge.textContent = remaining > 9 ? '9+' : String(remaining);
       badge.hidden = remaining === 0;
     });
+    // 홈 화면에 추가한 경우, 앱 아이콘에도 카톡처럼 숫자 배지를 띄운다 (지원하는 브라우저에서만)
+    if (navigator.setAppBadge) {
+      try {
+        if (remaining > 0) navigator.setAppBadge(remaining);
+        else navigator.clearAppBadge();
+      } catch (e) { /* 지원 안 하는 환경은 조용히 무시 */ }
+    }
   }
 
   // 새로고침 안 하고 홈페이지를 보고 있는 중에도 새 알림이 오면 바로 배지에 반영되도록,
