@@ -1462,6 +1462,39 @@ tr:last-child td { border-bottom: none; }
   .install-fab svg { width: 15px; height: 15px; }
 }
 
+/* ---------- 알림 받기(웹 푸시) ---------- */
+.push-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 20px;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-wine);
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: opacity .18s ease, transform .18s ease, background .18s ease;
+}
+
+.push-fab:hover { background: var(--color-wine-dark); }
+.push-fab svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+.push-fab.is-subscribed { background: var(--color-ink); }
+.push-fab.is-subscribed:hover { background: var(--color-ink); opacity: .9; }
+
+@media (max-width: 640px) {
+  .push-fab { right: 12px; bottom: 16px; padding: 11px 16px; font-size: 13px; }
+  .push-fab svg { width: 15px; height: 15px; }
+}
+
 /* ---------- 한옥마을 오시는 길 카드 ---------- */
 .route-card {
   display: flex;

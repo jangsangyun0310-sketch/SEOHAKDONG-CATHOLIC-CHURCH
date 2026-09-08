@@ -4,3 +4,30 @@
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', () => {});
+
+// ---------- 웹 푸시 알림(Firebase Cloud Messaging) ----------
+// 화면이 꺼져있거나 다른 앱을 보고 있을 때(백그라운드) 알림을 띄워주는 부분.
+// push-config.js와 값이 같아야 하며, 서비스워커는 페이지의 window 값을 못 읽으므로 여기 직접 적어둔다.
+importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "REPLACE_ME",
+  authDomain: "REPLACE_ME.firebaseapp.com",
+  projectId: "REPLACE_ME",
+  storageBucket: "REPLACE_ME.appspot.com",
+  messagingSenderId: "REPLACE_ME",
+  appId: "REPLACE_ME"
+});
+
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {
+  const title = (payload.notification && payload.notification.title) || '서학동성당';
+  const body = (payload.notification && payload.notification.body) || '';
+  self.registration.showNotification(title, {
+    body,
+    icon: 'assets/img/icons/icon-192.png',
+    badge: 'assets/img/icons/icon-192.png'
+  });
+});

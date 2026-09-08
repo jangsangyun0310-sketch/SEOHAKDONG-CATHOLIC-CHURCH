@@ -467,8 +467,47 @@
   </div>
 </div>
 
+<button type="button" class="push-fab" id="pushAppBtn">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+  <span id="pushAppBtnLabel">알림 받기</span>
+</button>
+
+<div class="install-modal" id="pushModal">
+  <div class="install-modal-inner">
+    <div class="install-modal-head">
+      <strong>성당 알림 받기</strong>
+      <button class="lightbox-close" id="pushModalClose" aria-label="닫기">✕</button>
+    </div>
+    <div id="pushGuideIOS" hidden>
+      <p class="install-guide-lead">아이폰에서는 먼저 홈 화면에 추가해야 알림을 받을 수 있어요.</p>
+      <ol class="install-steps">
+        <li><span class="install-step-num">1</span><span>이 창을 닫고 <strong>"홈 화면에 추가"</strong> 버튼을 먼저 눌러주세요.</span></li>
+        <li><span class="install-step-num">2</span><span>홈 화면에 추가된 아이콘으로 다시 들어와 <strong>"알림 받기"</strong>를 눌러주세요.</span></li>
+      </ol>
+    </div>
+    <div id="pushGuideDenied" hidden>
+      <p class="install-guide-lead">알림이 차단되어 있어요. 브라우저 설정에서 다시 켜주세요.</p>
+      <ol class="install-steps">
+        <li><span class="install-step-num">1</span><span>주소창 왼쪽의 <strong>자물쇠 아이콘</strong>(또는 브라우저 설정)을 눌러주세요.</span></li>
+        <li><span class="install-step-num">2</span><span><strong>"알림"</strong> 항목을 찾아 <strong>허용</strong>으로 바꿔주세요.</span></li>
+        <li><span class="install-step-num">3</span><span>이 페이지를 새로고침한 뒤 다시 눌러주세요.</span></li>
+      </ol>
+    </div>
+    <div id="pushGuideInApp" hidden>
+      <p class="install-guide-lead">카카오톡 화면 안에서는 알림을 켤 수 없어요.</p>
+      <p class="install-guide-note" style="border-top:none;padding-top:0;">화면 오른쪽 위 메뉴에서 <strong>"다른 브라우저로 열기"</strong>를 눌러 연 뒤, 그 화면에서 다시 눌러주세요.</p>
+    </div>
+    <p class="install-guide-note">전달사항이 있을 때만 성당에서 알림을 보내드려요. 언제든 이 버튼을 다시 눌러 끌 수 있어요.</p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/push-config.js"></script>
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=cbcb370204a8f8c4a89fb47c6e001a5f&libraries=services&autoload=false"></script>
 <script src="assets/js/main.js"></script>
+<script src="assets/js/push.js"></script>
 <script>
   // "홈 화면에 추가" — 신자분들이 앱처럼 바로 들어올 수 있도록 안내
   (function () {
