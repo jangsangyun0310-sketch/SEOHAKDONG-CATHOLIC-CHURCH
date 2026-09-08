@@ -1390,7 +1390,7 @@ tr:last-child td { border-bottom: none; }
 .install-fab:hover { background: var(--color-wine-dark); }
 
 .install-fab.is-dimmed {
-  opacity: .32;
+  opacity: .62;
   transform: scale(.94);
 }
 

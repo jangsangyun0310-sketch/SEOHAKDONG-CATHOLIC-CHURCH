@@ -538,12 +538,13 @@
       installBtn.style.pointerEvents = prevPE;
       installBtn.classList.toggle('is-dimmed', overlapsText);
     }
+    // 처음 페이지를 열었을 때는 절대 흐리게 하지 않는다 — 어르신들이 봤을 때
+    // 버튼이 아예 없는 것처럼 보이면 안 되므로, 스크롤을 실제로 한 뒤에만 확인한다
     window.addEventListener('scroll', () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => { updateDimState(); ticking = false; });
     }, { passive: true });
-    updateDimState();
   })();
 
   if ('serviceWorker' in navigator) {
