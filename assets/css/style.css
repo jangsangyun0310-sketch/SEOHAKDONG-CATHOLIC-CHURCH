@@ -309,6 +309,9 @@ ul {
 
 @media (max-width: 640px) {
   .brand-logo { height: 52px; }
+  .nav-bar { gap: 8px; }
+  .notif-bell--mobile,
+  .nav-toggle { width: 36px; height: 36px; flex-shrink: 0; }
 }
 
 .brand-text small {
