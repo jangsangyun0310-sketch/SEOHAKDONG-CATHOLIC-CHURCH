@@ -47,6 +47,32 @@
     return firebaseApp;
   }
 
+  // 브라우저 탭이 열려 화면에 떠 있는 상태(포그라운드)에서 알림이 오면
+  // 서비스워커의 백그라운드 처리기가 아니라 이 리스너로 전달되므로,
+  // 여기서도 똑같이 실제 알림창을 띄워줘야 놓치지 않는다.
+  let listeningForMessages = false;
+  function listenForForegroundMessages(messaging) {
+    if (listeningForMessages) return;
+    listeningForMessages = true;
+    messaging.onMessage((payload) => {
+      const title = (payload.notification && payload.notification.title) || '서학동성당';
+      const body = (payload.notification && payload.notification.body) || '';
+      navigator.serviceWorker.getRegistration('service-worker.js').then((reg) => {
+        if (reg) reg.showNotification(title, { body, icon: 'assets/img/icons/icon-192.png' });
+      });
+      setLabel(`🔔 ${title}`, true);
+    });
+  }
+
+  // 이미 구독 중인 상태로 페이지를 새로고침한 경우에도 포그라운드 알림을 받을 수 있도록 준비해둔다
+  if (subscribedNow() && Notification.permission === 'granted') {
+    navigator.serviceWorker.register('service-worker.js').then((reg) => {
+      getFirebaseApp();
+      const messaging = firebase.messaging();
+      listenForForegroundMessages(messaging);
+    }).catch(() => {});
+  }
+
   async function subscribe() {
     if (isInApp) { openModal('pushGuideInApp'); return; }
     if (isIOS && !isStandalone) { openModal('pushGuideIOS'); return; }
@@ -78,12 +104,7 @@
       setLabel('알림 받는 중 ✓', true);
       btn.classList.add('is-subscribed');
 
-      messaging.onMessage((payload) => {
-        const title = (payload.notification && payload.notification.title) || '서학동성당';
-        const body = (payload.notification && payload.notification.body) || '';
-        setLabel(`🔔 ${title}`, true);
-        if (body) console.log('[알림]', title, body);
-      });
+      listenForForegroundMessages(messaging);
     } catch (err) {
       console.error(err);
       setLabel('알림 켜기 실패, 다시 눌러주세요', true);
