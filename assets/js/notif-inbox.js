@@ -78,13 +78,14 @@
     });
   }
 
-  function loadAnnouncements() {
+  // 새로고침 안 하고 홈페이지를 보고 있는 중에도 새 알림이 오면 바로 배지에 반영되도록,
+  // 한 번만 읽어오는 get() 대신 실시간으로 계속 지켜보는 onSnapshot()을 쓴다
+  function watchAnnouncements() {
     getFirebaseApp();
-    return firebase.firestore().collection('announcements')
+    firebase.firestore().collection('announcements')
       .orderBy('createdAt', 'desc')
       .limit(30)
-      .get()
-      .then((snap) => {
+      .onSnapshot((snap) => {
         items = snap.docs.map((doc) => {
           const d = doc.data();
           return {
@@ -95,8 +96,8 @@
           };
         });
         updateBadge();
-      })
-      .catch((err) => console.error('알림함 불러오기 실패', err));
+        if (panel.classList.contains('open')) renderList();
+      }, (err) => console.error('알림함 실시간 감지 실패', err));
   }
 
   function openPanel() {
@@ -115,5 +116,5 @@
   if (closeBtn) closeBtn.addEventListener('click', closePanel);
   panel.addEventListener('click', (e) => { if (e.target === panel) closePanel(); });
 
-  loadAnnouncements();
+  watchAnnouncements();
 })();
