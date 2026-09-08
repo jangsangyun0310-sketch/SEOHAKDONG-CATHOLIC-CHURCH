@@ -16,6 +16,52 @@ document.addEventListener("DOMContentLoaded", () => {
   const yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
+  // 홈페이지 링크 공유하기 — 모바일은 공유 시트, 안 되는 환경은 링크 복사로 대체
+  const shareBtn = document.getElementById("shareBtn");
+  const shareBtnLabel = document.getElementById("shareBtnLabel");
+  if (shareBtn && shareBtnLabel) {
+    const defaultLabel = shareBtnLabel.textContent;
+    function flashLabel(text) {
+      shareBtnLabel.textContent = text;
+      setTimeout(() => { shareBtnLabel.textContent = defaultLabel; }, 2000);
+    }
+    function copyLink() {
+      const url = location.href;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          () => flashLabel("링크가 복사됐어요!"),
+          () => flashLabel("복사에 실패했어요")
+        );
+        return;
+      }
+      // 클립보드 API를 못 쓰는 구형 브라우저 대비
+      const temp = document.createElement("textarea");
+      temp.value = url;
+      temp.style.position = "fixed";
+      temp.style.opacity = "0";
+      document.body.appendChild(temp);
+      temp.select();
+      try {
+        document.execCommand("copy");
+        flashLabel("링크가 복사됐어요!");
+      } catch (err) {
+        flashLabel("복사에 실패했어요");
+      }
+      document.body.removeChild(temp);
+    }
+    shareBtn.addEventListener("click", async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: document.title, url: location.href });
+        } catch (err) {
+          // 사용자가 공유를 취소한 경우 등은 그냥 둔다
+        }
+        return;
+      }
+      copyLink();
+    });
+  }
+
   // 미사시간 탭 (주일 / 평일)
   document.querySelectorAll(".mass-tab").forEach((tab) => {
     tab.addEventListener("click", () => {
