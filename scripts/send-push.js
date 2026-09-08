@@ -27,7 +27,7 @@ async function main() {
   }
 
   // 푸시 구독자가 없어도 홈페이지 알림함에는 남겨서, 나중에 방문한 분도 볼 수 있게 한다
-  await db.collection('announcements').add({
+  const announcementRef = await db.collection('announcements').add({
     title,
     body,
     createdAt: admin.firestore.FieldValue.serverTimestamp()
@@ -40,11 +40,13 @@ async function main() {
     return;
   }
 
+  // tag를 알림함 문서 id로 지정해두면, 홈페이지 알림함에서 지울 때 실제 휴대폰 알림도 같이 지울 수 있다
   const message = {
     notification: { title, body },
+    data: { announcementId: announcementRef.id },
     webpush: {
       fcmOptions: { link: SITE_URL },
-      notification: { icon: SITE_URL + 'assets/img/icons/icon-192.png' }
+      notification: { icon: SITE_URL + 'assets/img/icons/icon-192.png', tag: announcementRef.id }
     }
   };
 

@@ -25,9 +25,21 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   const title = (payload.notification && payload.notification.title) || '서학동성당';
   const body = (payload.notification && payload.notification.body) || '';
+  const id = payload.data && payload.data.announcementId;
   self.registration.showNotification(title, {
     body,
     icon: 'assets/img/icons/icon-192.png',
-    badge: 'assets/img/icons/icon-192.png'
+    badge: 'assets/img/icons/icon-192.png',
+    tag: id,
+    data: { id }
   });
+});
+
+// 홈페이지 알림함에서 지우면, 페이지가 여기로 메시지를 보내 실제 휴대폰 알림도 같이 닫는다
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'CLOSE_NOTIFICATION' && event.data.id) {
+    self.registration.getNotifications({ tag: event.data.id }).then((notifs) => {
+      notifs.forEach((n) => n.close());
+    });
+  }
 });

@@ -57,8 +57,9 @@
     messaging.onMessage((payload) => {
       const title = (payload.notification && payload.notification.title) || '서학동성당';
       const body = (payload.notification && payload.notification.body) || '';
+      const id = payload.data && payload.data.announcementId;
       navigator.serviceWorker.getRegistration('service-worker.js').then((reg) => {
-        if (reg) reg.showNotification(title, { body, icon: 'assets/img/icons/icon-192.png' });
+        if (reg) reg.showNotification(title, { body, icon: 'assets/img/icons/icon-192.png', tag: id, data: { id } });
       });
       setLabel(`🔔 ${title}`, true);
     });

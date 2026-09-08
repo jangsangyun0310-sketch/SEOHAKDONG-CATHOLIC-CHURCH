@@ -56,6 +56,13 @@
         addDismissed(it.id);
         renderList();
         updateBadge();
+        // 홈페이지 알림함에서 지우면 휴대폰 알림함(시스템 알림)에 남아있는 실제 알림도 같이 닫아서,
+        // 홈 화면 아이콘 배지 숫자도 같이 줄어들게 한다
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistration('service-worker.js').then((reg) => {
+            if (reg && reg.active) reg.active.postMessage({ type: 'CLOSE_NOTIFICATION', id: it.id });
+          }).catch(() => {});
+        }
       });
       li.appendChild(body);
       li.appendChild(delBtn);
