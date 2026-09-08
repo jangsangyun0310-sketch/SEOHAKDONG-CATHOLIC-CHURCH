@@ -11,19 +11,88 @@
   if (!supported) { bellBtns.forEach((b) => b.remove()); return; }
 
   const DISMISSED_KEY = 'seohakdong-dismissed-notifs';
-
-  function getDismissed() {
-    try { return new Set(JSON.parse(localStorage.getItem(DISMISSED_KEY) || '[]')); }
-    catch (e) { return new Set(); }
-  }
-  function addDismissed(id) {
-    const set = getDismissed();
-    set.add(id);
-    localStorage.setItem(DISMISSED_KEY, JSON.stringify([...set]));
-  }
+  const SYNC_CODE_KEY = 'seohakdong-sync-code';
 
   function getFirebaseApp() {
     return firebase.apps.length ? firebase.apps[0] : firebase.initializeApp(window.FIREBASE_CONFIG);
+  }
+
+  // 지운 알림 목록: 코드로 다른 기기와 연결 안 했으면 이 기기(localStorage)에만,
+  // 연결했으면 Firestore의 공유 문서(sync_dismissed/코드)로 관리해 여러 기기에 실시간 반영한다
+  let dismissedIds = new Set();
+  let syncCode = localStorage.getItem(SYNC_CODE_KEY) || null;
+  let syncUnsub = null;
+
+  function loadLocalDismissed() {
+    try { return new Set(JSON.parse(localStorage.getItem(DISMISSED_KEY) || '[]')); }
+    catch (e) { return new Set(); }
+  }
+  function saveLocalDismissed(set) {
+    localStorage.setItem(DISMISSED_KEY, JSON.stringify([...set]));
+  }
+
+  function addDismissed(id) {
+    dismissedIds.add(id);
+    if (syncCode) {
+      getFirebaseApp();
+      firebase.firestore().collection('sync_dismissed').doc(syncCode)
+        .set({ ids: firebase.firestore.FieldValue.arrayUnion(id) }, { merge: true })
+        .catch((err) => console.error('동기화 저장 실패', err));
+    } else {
+      saveLocalDismissed(dismissedIds);
+    }
+  }
+
+  function startSync(code) {
+    getFirebaseApp();
+    if (syncUnsub) syncUnsub();
+    syncUnsub = firebase.firestore().collection('sync_dismissed').doc(code)
+      .onSnapshot((doc) => {
+        dismissedIds = new Set((doc.exists && doc.data().ids) || []);
+        renderList();
+        updateBadge();
+      }, (err) => console.error('동기화 감지 실패', err));
+  }
+  function stopSync() {
+    if (syncUnsub) syncUnsub();
+    syncUnsub = null;
+  }
+
+  const syncStatusEl = document.getElementById('notifSyncStatus');
+  const syncBtn = document.getElementById('notifSyncBtn');
+  function refreshSyncUI() {
+    if (!syncStatusEl || !syncBtn) return;
+    syncStatusEl.textContent = syncCode
+      ? `다른 기기와 연결됨 (코드: ${syncCode})`
+      : '이 기기에서만 지운 알림이 반영돼요.';
+    syncBtn.textContent = syncCode ? '연결 해제' : '다른 기기와 연결';
+  }
+  if (syncBtn) {
+    syncBtn.addEventListener('click', () => {
+      if (syncCode) {
+        if (!confirm(`다른 기기와의 연결을 해제할까요? (코드: ${syncCode})`)) return;
+        stopSync();
+        syncCode = null;
+        localStorage.removeItem(SYNC_CODE_KEY);
+        dismissedIds = loadLocalDismissed();
+        renderList();
+        updateBadge();
+        refreshSyncUI();
+        return;
+      }
+      const input = prompt('다른 기기와 연결할 코드를 입력하세요.\n처음이면 아무 숫자나 4자리 이상 만들어서, 다른 기기에도 똑같이 입력해주세요.', '');
+      const code = input && input.trim();
+      if (!code) return;
+      syncCode = code;
+      localStorage.setItem(SYNC_CODE_KEY, code);
+      getFirebaseApp();
+      const ref = firebase.firestore().collection('sync_dismissed').doc(code);
+      const existing = [...dismissedIds];
+      ref.set({ ids: existing.length ? firebase.firestore.FieldValue.arrayUnion(...existing) : [] }, { merge: true })
+        .catch((err) => console.error('동기화 시작 실패', err));
+      startSync(code);
+      refreshSyncUI();
+    });
   }
 
   function formatDate(date) {
@@ -34,8 +103,7 @@
   let items = [];
 
   function renderList() {
-    const dismissed = getDismissed();
-    const visible = items.filter((it) => !dismissed.has(it.id));
+    const visible = items.filter((it) => !dismissedIds.has(it.id));
     listEl.innerHTML = '';
     emptyEl.hidden = visible.length > 0;
     visible.forEach((it) => {
@@ -72,8 +140,7 @@
 
   // 배지 숫자 = 지우지 않고 알림함에 남아있는 알림 개수 (읽었는지 여부와 무관)
   function updateBadge() {
-    const dismissed = getDismissed();
-    const remaining = items.filter((it) => !dismissed.has(it.id)).length;
+    const remaining = items.filter((it) => !dismissedIds.has(it.id)).length;
     bellBtns.forEach((b) => {
       const badge = b.querySelector('.notif-bell-badge');
       if (!badge) return;
@@ -122,5 +189,8 @@
   if (closeBtn) closeBtn.addEventListener('click', closePanel);
   panel.addEventListener('click', (e) => { if (e.target === panel) closePanel(); });
 
+  dismissedIds = loadLocalDismissed();
+  refreshSyncUI();
+  if (syncCode) startSync(syncCode);
   watchAnnouncements();
 })();
