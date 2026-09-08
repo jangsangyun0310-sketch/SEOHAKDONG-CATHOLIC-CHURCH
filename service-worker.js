@@ -12,12 +12,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey: "REPLACE_ME",
-  authDomain: "REPLACE_ME.firebaseapp.com",
-  projectId: "REPLACE_ME",
-  storageBucket: "REPLACE_ME.appspot.com",
-  messagingSenderId: "REPLACE_ME",
-  appId: "REPLACE_ME"
+  apiKey: "AIzaSyBFqfixoo2Rky7VU7-WPZ43qisL3dFMY9g",
+  authDomain: "seohakdong-church.firebaseapp.com",
+  projectId: "seohakdong-church",
+  storageBucket: "seohakdong-church.firebasestorage.app",
+  messagingSenderId: "270912339972",
+  appId: "1:270912339972:web:f25d3096f300c3de72b551"
 });
 
 const messaging = firebase.messaging();

@@ -8,7 +8,8 @@
   const STORAGE_KEY = 'seohakdong-push-subscribed';
 
   const supported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window
-    && window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey !== 'REPLACE_ME';
+    && window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey !== 'REPLACE_ME'
+    && window.FIREBASE_VAPID_KEY && window.FIREBASE_VAPID_KEY !== 'REPLACE_ME';
   if (!supported) { btn.remove(); return; }
 
   const ua = navigator.userAgent;
