@@ -72,6 +72,9 @@
       const messaging = firebase.messaging();
       listenForForegroundMessages(messaging);
       try {
+        // getToken()은 기존 구독이 남아있으면 캐시된(어쩌면 이미 만료된) 토큰을 그대로 돌려주므로,
+        // 먼저 지워서 매번 진짜 새 토큰을 강제로 발급받는다
+        await messaging.deleteToken().catch(() => {});
         const token = await messaging.getToken({ vapidKey: window.FIREBASE_VAPID_KEY, serviceWorkerRegistration: reg });
         if (token) {
           await firebase.firestore().collection('push_tokens').doc(token).set({
