@@ -1495,6 +1495,69 @@ tr:last-child td { border-bottom: none; }
   .push-fab svg { width: 15px; height: 15px; }
 }
 
+/* ---------- 알림함 ---------- */
+.notif-bell {
+  position: relative;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--color-wine-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.notif-bell svg { width: 19px; height: 19px; }
+
+.notif-bell-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d0342c;
+  border: 2px solid #fff;
+}
+
+.notif-list { list-style: none; margin: 0 0 4px; padding: 0; display: flex; flex-direction: column; gap: 2px; max-height: 55vh; overflow-y: auto; }
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.notif-item:last-child { border-bottom: none; }
+
+.notif-item-body { flex: 1; min-width: 0; }
+
+.notif-item-title { display: block; font-size: 15px; margin-bottom: 4px; }
+
+.notif-item-text { font-size: 14px; line-height: 1.55; color: var(--color-ink-soft); margin: 0 0 6px; white-space: pre-line; }
+
+.notif-item-date { font-size: 12.5px; color: var(--color-ink-soft); opacity: .8; }
+
+.notif-item-del {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  background: none;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.notif-item-del:hover { background: var(--color-ivory-deep); }
+
 /* ---------- 한옥마을 오시는 길 카드 ---------- */
 .route-card {
   display: flex;

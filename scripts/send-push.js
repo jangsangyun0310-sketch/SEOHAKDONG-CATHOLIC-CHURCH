@@ -26,10 +26,17 @@ async function main() {
     process.exit(1);
   }
 
+  // 푸시 구독자가 없어도 홈페이지 알림함에는 남겨서, 나중에 방문한 분도 볼 수 있게 한다
+  await db.collection('announcements').add({
+    title,
+    body,
+    createdAt: admin.firestore.FieldValue.serverTimestamp()
+  });
+
   const snapshot = await db.collection('push_tokens').get();
   const tokens = snapshot.docs.map((d) => d.id);
   if (tokens.length === 0) {
-    console.log('아직 알림을 구독한 사람이 없습니다.');
+    console.log('알림함에는 저장했지만, 아직 알림을 구독한 사람이 없어 푸시는 못 보냈습니다.');
     return;
   }
 
@@ -72,6 +79,7 @@ async function main() {
   console.log(
     `발송 완료: 성공 ${successCount}건, 실패 ${failCount}건`
     + (invalidTokens.length ? `, 만료된 구독 ${invalidTokens.length}건 정리` : '')
+    + ' (알림함에도 저장됨)'
   );
 }
 
