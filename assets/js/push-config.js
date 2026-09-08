@@ -12,4 +12,4 @@ window.FIREBASE_CONFIG = {
 };
 
 // Firebase 콘솔 > 프로젝트 설정 > 클라우드 메시징 > 웹 구성 > "웹 푸시 인증서" 에서 키 쌍을 생성하면 나오는 값
-window.FIREBASE_VAPID_KEY = "REPLACE_ME";
+window.FIREBASE_VAPID_KEY = "BEy7c9Fwfyl0WDP-n_ZYCPEGHNgO8WNUTrbQ3xmpadJMyEZeF7PvqWHfJd16PEoiYiiiuTua59rKORXK44RKt1A";
