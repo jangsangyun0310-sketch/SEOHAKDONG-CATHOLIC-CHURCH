@@ -1582,23 +1582,6 @@ tr:last-child td { border-bottom: none; }
 
 .notif-item-del:hover { background: var(--color-ivory-deep); }
 
-.notif-sync-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-
-.notif-sync-btn {
-  flex-shrink: 0;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid var(--color-line);
-  background: none;
-  color: var(--color-wine-dark);
-  font-family: inherit;
-  font-size: 12.5px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.notif-sync-btn:hover { background: var(--color-ivory-deep); }
-
 /* ---------- 한옥마을 오시는 길 카드 ---------- */
 .route-card {
   display: flex;
