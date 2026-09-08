@@ -413,6 +413,9 @@ ul {
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  /* overflow-x:auto makes overflow-y compute to auto too, which clips the
+     hover translateY(-1px) shift on .pill-link's top border — pad it out */
+  padding: 3px 0;
 }
 
 .quicklinks-row::-webkit-scrollbar { display: none; }
