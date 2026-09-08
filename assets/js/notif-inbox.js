@@ -69,10 +69,12 @@
   function updateBadge() {
     const dismissed = getDismissed();
     const lastViewed = getLastViewed();
-    const hasUnread = items.some((it) => !dismissed.has(it.id) && it.createdAt && it.createdAt.getTime() > lastViewed);
+    const unreadCount = items.filter((it) => !dismissed.has(it.id) && it.createdAt && it.createdAt.getTime() > lastViewed).length;
     bellBtns.forEach((b) => {
       const badge = b.querySelector('.notif-bell-badge');
-      if (badge) badge.hidden = !hasUnread;
+      if (!badge) return;
+      badge.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+      badge.hidden = unreadCount === 0;
     });
   }
 
