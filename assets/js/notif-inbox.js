@@ -1,15 +1,14 @@
 // 알림함 — 성당에서 보낸 알림을 홈페이지 안에도 목록으로 남겨서,
 // 푸시 알림을 못 받는 분(아이폰 등)도 볼 수 있고, 각자 필요 없는 건 지울 수 있게 한다.
 (function () {
-  const bellBtn = document.getElementById('notifBellBtn');
-  const badge = document.getElementById('notifBellBadge');
+  const bellBtns = document.querySelectorAll('.notif-bell');
   const panel = document.getElementById('notifPanel');
   const listEl = document.getElementById('notifList');
   const emptyEl = document.getElementById('notifEmpty');
-  if (!bellBtn || !panel || !listEl) return;
+  if (!bellBtns.length || !panel || !listEl) return;
 
   const supported = window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey !== 'REPLACE_ME';
-  if (!supported) { bellBtn.remove(); return; }
+  if (!supported) { bellBtns.forEach((b) => b.remove()); return; }
 
   const DISMISSED_KEY = 'seohakdong-dismissed-notifs';
   const LAST_VIEWED_KEY = 'seohakdong-notif-last-viewed';
@@ -71,7 +70,10 @@
     const dismissed = getDismissed();
     const lastViewed = getLastViewed();
     const hasUnread = items.some((it) => !dismissed.has(it.id) && it.createdAt && it.createdAt.getTime() > lastViewed);
-    badge.hidden = !hasUnread;
+    bellBtns.forEach((b) => {
+      const badge = b.querySelector('.notif-bell-badge');
+      if (badge) badge.hidden = !hasUnread;
+    });
   }
 
   function loadAnnouncements() {
@@ -99,11 +101,14 @@
     renderList();
     panel.classList.add('open');
     localStorage.setItem(LAST_VIEWED_KEY, String(Date.now()));
-    badge.hidden = true;
+    bellBtns.forEach((b) => {
+      const badge = b.querySelector('.notif-bell-badge');
+      if (badge) badge.hidden = true;
+    });
   }
   function closePanel() { panel.classList.remove('open'); }
 
-  bellBtn.addEventListener('click', openPanel);
+  bellBtns.forEach((b) => b.addEventListener('click', openPanel));
   const closeBtn = document.getElementById('notifPanelClose');
   if (closeBtn) closeBtn.addEventListener('click', closePanel);
   panel.addEventListener('click', (e) => { if (e.target === panel) closePanel(); });

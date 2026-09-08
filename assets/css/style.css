@@ -329,6 +329,11 @@ ul {
   position: relative;
 }
 
+.nav-menu-bell-item {
+  display: flex;
+  align-items: center;
+}
+
 .nav-menu > li > a {
   display: block;
   padding: 12px 18px;
@@ -1512,6 +1517,13 @@ tr:last-child td { border-bottom: none; }
 }
 
 .notif-bell svg { width: 19px; height: 19px; }
+
+.notif-bell--mobile { display: none; }
+
+@media (max-width: 860px) {
+  .notif-bell--desktop { display: none; }
+  .notif-bell--mobile { display: flex; }
+}
 
 .notif-bell-badge {
   position: absolute;
