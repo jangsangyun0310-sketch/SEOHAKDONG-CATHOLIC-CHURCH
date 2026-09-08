@@ -64,12 +64,24 @@
     });
   }
 
-  // 이미 구독 중인 상태로 페이지를 새로고침한 경우에도 포그라운드 알림을 받을 수 있도록 준비해둔다
+  // 이미 구독 중인 상태로 페이지를 새로고침한 경우에도 포그라운드 알림을 받을 수 있도록 준비해두고,
+  // 서비스워커가 갱신되면서 예전 토큰이 만료되는 경우가 있어 매번 토큰을 다시 확인해 저장해둔다
   if (subscribedNow() && Notification.permission === 'granted') {
-    navigator.serviceWorker.register('service-worker.js').then((reg) => {
+    navigator.serviceWorker.register('service-worker.js').then(async (reg) => {
       getFirebaseApp();
       const messaging = firebase.messaging();
       listenForForegroundMessages(messaging);
+      try {
+        const token = await messaging.getToken({ vapidKey: window.FIREBASE_VAPID_KEY, serviceWorkerRegistration: reg });
+        if (token) {
+          await firebase.firestore().collection('push_tokens').doc(token).set({
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            ua: navigator.userAgent
+          });
+        }
+      } catch (err) {
+        console.error('토큰 갱신 실패', err);
+      }
     }).catch(() => {});
   }
 
