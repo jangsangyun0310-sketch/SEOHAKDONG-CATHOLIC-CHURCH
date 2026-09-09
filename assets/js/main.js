@@ -115,6 +115,120 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(() => {});
   }
 
+  // 주보 아카이브 — content/bulletins.json에서 불러와 채움 (관리자 페이지에서 편집)
+  (function () {
+    const latestEl = document.getElementById("bulletinLatest");
+    const yearTabsEl = document.getElementById("bulletinYearTabs");
+    const weekListEl = document.getElementById("bulletinWeekList");
+    if (!latestEl || !yearTabsEl || !weekListEl) return;
+
+    fetch("content/bulletins.json")
+      .then((res) => res.json())
+      .then((data) => {
+        const items = (data && data.items) || [];
+        if (!items.length) {
+          latestEl.innerHTML = `
+            <div><p class="eyebrow" style="margin-bottom:6px;">최근 게시된 주보</p><h3 style="margin:0;">주보 자료 준비중</h3></div>
+            <span class="badge badge--todo">준비중</span>
+          `;
+          weekListEl.innerHTML = '<li class="bulletin-empty-note">아직 등록된 주보가 없습니다. 자료가 확보되는 대로 추가하겠습니다.</li>';
+          return;
+        }
+
+        const byYear = {};
+        items.forEach((item) => {
+          const year = String(item.date || "").slice(0, 4);
+          if (!byYear[year]) byYear[year] = [];
+          byYear[year].push(item);
+        });
+        const years = Object.keys(byYear).sort((a, b) => b.localeCompare(a));
+        const latest = items.slice().sort((a, b) => String(a.date).localeCompare(String(b.date))).pop();
+        let currentYear = years[0] || null;
+
+        function renderLatest() {
+          latestEl.innerHTML = `
+            <div>
+              <p class="eyebrow" style="margin-bottom:6px;">최근 게시된 주보 (${escapeHtml(latest.date || "")})</p>
+              <h3 style="margin:0;">${escapeHtml(latest.title || "")}</h3>
+            </div>
+            <button class="btn btn--primary" type="button" id="bulletinLatestBtn">주보 보기</button>
+          `;
+          const btn = document.getElementById("bulletinLatestBtn");
+          if (btn) btn.addEventListener("click", () => openBulletin(latest));
+        }
+
+        function renderYearTabs() {
+          yearTabsEl.innerHTML = "";
+          years.forEach((y) => {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "year-tab" + (y === currentYear ? " active" : "");
+            btn.textContent = y + "년";
+            btn.addEventListener("click", () => {
+              currentYear = currentYear === y ? null : y;
+              renderYearTabs();
+              renderWeekList();
+            });
+            yearTabsEl.appendChild(btn);
+          });
+        }
+
+        function renderWeekList() {
+          weekListEl.innerHTML = "";
+          if (!currentYear) {
+            weekListEl.innerHTML = '<li class="bulletin-empty-note">연도를 선택하면 주보 목록이 표시됩니다.</li>';
+            return;
+          }
+          const list = (byYear[currentYear] || [])
+            .slice()
+            .sort((a, b) => String(b.date).localeCompare(String(a.date)));
+          if (!list.length) {
+            weekListEl.innerHTML = '<li class="bulletin-empty-note">아직 등록된 주보가 없습니다. 자료가 확보되는 대로 추가하겠습니다.</li>';
+            return;
+          }
+          list.forEach((item) => {
+            const li = document.createElement("li");
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "bulletin-week-row";
+            btn.innerHTML = `<span class="wdate">${escapeHtml(item.date || "")}</span><span class="wtitle">${escapeHtml(item.title || "")}</span>`;
+            btn.addEventListener("click", () => openBulletin(item));
+            li.appendChild(btn);
+            weekListEl.appendChild(li);
+          });
+        }
+
+        function openBulletin(item) {
+          const lightbox = document.getElementById("lightbox");
+          const lightboxImg = document.getElementById("lightboxImg");
+          const lightboxCap = document.getElementById("lightboxCap");
+          if (!lightbox || !lightboxImg || !lightboxCap) return;
+          lightboxImg.innerHTML = "";
+          lightboxImg.classList.remove("placeholder-photo");
+          if (item.image) {
+            const img = document.createElement("img");
+            img.src = item.image;
+            img.alt = `${item.date || ""} 주보`;
+            img.style.width = "100%";
+            img.style.height = "100%";
+            img.style.objectFit = "cover";
+            img.style.display = "block";
+            lightboxImg.appendChild(img);
+          } else {
+            lightboxImg.classList.add("placeholder-photo");
+            lightboxImg.textContent = "사진 준비중";
+          }
+          lightboxCap.textContent = `${item.date || ""} · ${item.title || ""}`;
+          lightbox.classList.add("open");
+        }
+
+        renderLatest();
+        renderYearTabs();
+        renderWeekList();
+      })
+      .catch(() => {});
+  })();
+
   // 갤러리 라이트박스
   const lightbox = document.getElementById("lightbox");
   const lightboxImg = document.getElementById("lightboxImg");

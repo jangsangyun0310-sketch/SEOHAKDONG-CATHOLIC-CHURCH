@@ -2073,6 +2073,39 @@ tr:last-child td { border-bottom: none; }
   border-top: 1px solid var(--color-ink);
 }
 
+.bulletin-week-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 4px;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--color-line);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+.bulletin-week-row:hover {
+  background: var(--color-ivory-deep);
+}
+
+.bulletin-week-row .wdate {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--color-wine);
+  width: 104px;
+  flex: none;
+  font-size: 15px;
+}
+
+.bulletin-week-row .wtitle {
+  flex: 1;
+  font-size: 14px;
+  color: var(--color-ink-soft);
+}
+
 .bulletin-empty-note {
   padding: 28px 4px;
   color: var(--color-ink-soft);

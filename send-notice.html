@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>서학동성당 알림 발송</title>
+<style>
+  body { font-family: -apple-system, "Noto Sans KR", sans-serif; max-width: 480px; margin: 40px auto; padding: 0 20px; color: #17222d; }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  p.desc { color: #5b6672; font-size: 14px; margin-bottom: 24px; }
+  label { display: block; font-weight: 600; margin: 16px 0 6px; font-size: 14px; }
+  input[type=text], textarea {
+    width: 100%; box-sizing: border-box; padding: 10px 12px;
+    border: 1px solid #e7e1d6; border-radius: 8px; font-size: 15px; font-family: inherit;
+  }
+  textarea { min-height: 120px; resize: vertical; }
+  button {
+    margin-top: 20px; width: 100%; padding: 12px; font-size: 15px; font-weight: 700;
+    color: #fff; background: #0e6b63; border: none; border-radius: 8px; cursor: pointer;
+  }
+  button:disabled { opacity: .5; cursor: default; }
+  #status { margin-top: 16px; font-size: 14px; white-space: pre-wrap; }
+  #loginBox { text-align: center; padding: 60px 0; }
+  .logout-link {
+    background: none; color: #5b6672; font-weight: 400; text-decoration: underline;
+    padding: 0; width: auto; margin-top: 32px;
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+  <div id="loginBox">
+    <p>알림을 보내려면 로그인이 필요합니다.</p>
+    <button id="loginBtn" type="button">로그인</button>
+  </div>
+
+  <div id="formBox" hidden>
+    <h1>공지 알림 보내기</h1>
+    <p class="desc">여기서 보내면 신자분들 휴대폰에 알림이 가고, 홈페이지 알림함에도 남습니다.</p>
+    <label for="titleInput">제목</label>
+    <input id="titleInput" type="text" maxlength="60" placeholder="예: 이번 주 미사 시간 변경 안내">
+    <label for="bodyInput">내용</label>
+    <textarea id="bodyInput" maxlength="500" placeholder="알림에 보여줄 내용을 입력하세요"></textarea>
+    <button id="sendBtn" type="button">발송하기</button>
+    <div id="status"></div>
+    <button id="logoutBtn" type="button" class="logout-link">로그아웃</button>
+  </div>
+
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <script>
+    const loginBox = document.getElementById('loginBox');
+    const formBox = document.getElementById('formBox');
+    const statusEl = document.getElementById('status');
+    const sendBtn = document.getElementById('sendBtn');
+    const titleInput = document.getElementById('titleInput');
+    const bodyInput = document.getElementById('bodyInput');
+
+    function showUser(user) {
+      loginBox.hidden = !!user;
+      formBox.hidden = !user;
+    }
+
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.on('init', (user) => showUser(user));
+      window.netlifyIdentity.on('login', (user) => { showUser(user); window.netlifyIdentity.close(); });
+      window.netlifyIdentity.on('logout', () => showUser(null));
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', () => window.netlifyIdentity.open());
+    document.getElementById('logoutBtn').addEventListener('click', () => window.netlifyIdentity.logout());
+
+    sendBtn.addEventListener('click', async () => {
+      const title = titleInput.value.trim();
+      const body = bodyInput.value.trim();
+      if (!title || !body) {
+        statusEl.textContent = '제목과 내용을 모두 입력해주세요.';
+        return;
+      }
+      const user = window.netlifyIdentity.currentUser();
+      if (!user) {
+        statusEl.textContent = '로그인이 필요합니다.';
+        return;
+      }
+      sendBtn.disabled = true;
+      statusEl.textContent = '발송 중...';
+      try {
+        const token = await user.jwt();
+        const res = await fetch('/.netlify/functions/send-push', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify({ title, body }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          statusEl.textContent = data.message || '발송 완료';
+          titleInput.value = '';
+          bodyInput.value = '';
+        } else {
+          statusEl.textContent = '오류: ' + (data.error || '발송에 실패했습니다.');
+        }
+      } catch (err) {
+        statusEl.textContent = '오류: 네트워크 문제로 발송에 실패했습니다.';
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

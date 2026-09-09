@@ -28,6 +28,23 @@ collections:
               - { label: "날짜 (예: 2026.09.06)", name: "date", widget: "string" }
               - { label: "본문", name: "body", widget: "text" }
 
+  - name: "bulletins"
+    label: "주보"
+    files:
+      - name: "bulletins"
+        label: "주보 목록"
+        file: "content/bulletins.json"
+        fields:
+          - label: "주보 목록"
+            name: "items"
+            widget: "list"
+            label_singular: "주보"
+            summary: "{{title}} ({{date}})"
+            fields:
+              - { label: "날짜 (예: 2026.09.06)", name: "date", widget: "string" }
+              - { label: "제목 (예: 연중 제23주일)", name: "title", widget: "string" }
+              - { label: "주보 사진", name: "image", widget: "image", required: false }
+
   - name: "announce"
     label: "접속 시 팝업"
     files:

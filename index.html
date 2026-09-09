@@ -237,31 +237,11 @@
     <!-- 아래 목록은 content/notices.json에서 자동으로 채워집니다. admin/ 관리자 페이지에서 편집하세요. -->
     <div class="notice-list" id="noticeList"></div>
 
+    <!-- 아래 내용은 content/bulletins.json에서 자동으로 채워집니다. admin/ 관리자 페이지에서 편집하세요. -->
     <div id="bulletin" style="margin-top:44px; padding-top:36px; border-top:1px solid var(--color-line);">
-      <div class="bulletin-latest">
-        <div>
-          <p class="eyebrow" style="margin-bottom:6px;">최근 게시된 주보</p>
-          <h3 style="margin:0;">주보 자료 준비중</h3>
-        </div>
-        <span class="badge badge--todo">준비중</span>
-      </div>
-
-      <div class="bulletin-year-tabs">
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2026년</button>
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2025년</button>
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2024년</button>
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2023년</button>
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2022년</button>
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2021년</button>
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2020년</button>
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2019년</button>
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2018년</button>
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2017년</button>
-        <button class="year-tab" type="button" disabled title="자료 준비 중">2016년</button>
-      </div>
-      <ul class="bulletin-week-list">
-        <li class="bulletin-empty-note">아직 등록된 주보가 없습니다. 자료가 확보되는 대로 추가하겠습니다.</li>
-      </ul>
+      <div class="bulletin-latest" id="bulletinLatest"></div>
+      <div class="bulletin-year-tabs" id="bulletinYearTabs"></div>
+      <ul class="bulletin-week-list" id="bulletinWeekList"></ul>
     </div>
   </div>
 </section>
