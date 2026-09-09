@@ -522,6 +522,24 @@
   </div>
 </div>
 
+<!-- 접속 시 뜨는 공지·행사 안내 팝업. 아래 제목/본문/이미지를 실제 내용으로 바꿔서 쓰면 됩니다.
+     내용이 없을 때(임시 문구 그대로일 때)는 팝업을 아예 띄우지 않도록 announceModalActive를 false로 둡니다. -->
+<div class="install-modal" id="announceModal">
+  <div class="install-modal-inner">
+    <div class="install-modal-head">
+      <strong id="announceModalTitle">테스트 팝업</strong>
+      <button class="lightbox-close" id="announceModalCloseBtn" aria-label="닫기">✕</button>
+    </div>
+    <img src="assets/img/church-exterior.jpg" alt="" class="announce-modal-img" id="announceModalImg">
+    <p class="announce-modal-text" id="announceModalText">팝업창 기능 테스트입니다.
+실제로 쓰실 때는 이 제목/본문/이미지를 공지 내용으로 바꿔주세요.</p>
+    <label class="announce-modal-hide">
+      <input type="checkbox" id="announceModalHideToday">
+      오늘 하루 보지 않기
+    </label>
+  </div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -530,6 +548,7 @@
 <script src="assets/js/main.js?v=202609098"></script>
 <script src="assets/js/push.js?v=202609099"></script>
 <script src="assets/js/notif-inbox.js?v=202609098"></script>
+<script src="assets/js/announce-modal.js?v=202609099"></script>
 <script>
   // "홈 화면에 추가" — 신자분들이 앱처럼 바로 들어올 수 있도록 안내
   (function () {
