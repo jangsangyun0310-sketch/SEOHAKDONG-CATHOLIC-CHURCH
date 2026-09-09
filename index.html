@@ -518,6 +518,19 @@
 <script src="assets/js/push.js?v=202609099"></script>
 <script src="assets/js/notif-inbox.js?v=202609098"></script>
 <script src="assets/js/announce-modal.js?v=202609099"></script>
+<!-- 관리자 초대·비밀번호 재설정 메일 링크를 처리하기 위한 스크립트 (admin/ 페이지 로그인용) -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", (user) => {
+      if (!user) {
+        window.netlifyIdentity.on("login", () => {
+          document.location.href = "/admin/";
+        });
+      }
+    });
+  }
+</script>
 <script>
   // "홈 화면에 추가" — 신자분들이 앱처럼 바로 들어올 수 있도록 안내
   (function () {
