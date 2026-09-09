@@ -45,6 +45,23 @@ collections:
               - { label: "제목 (예: 연중 제23주일)", name: "title", widget: "string" }
               - { label: "주보 사진", name: "image", widget: "image", required: false }
 
+  - name: "gallery"
+    label: "갤러리"
+    files:
+      - name: "gallery"
+        label: "갤러리 사진 목록"
+        file: "content/gallery.json"
+        fields:
+          - label: "사진 목록"
+            name: "items"
+            widget: "list"
+            label_singular: "사진"
+            summary: "{{title}} ({{date}})"
+            fields:
+              - { label: "날짜 (예: 2024.05.19)", name: "date", widget: "string", hint: "연도별로 자동 분류됩니다." }
+              - { label: "제목", name: "title", widget: "string", hint: "제목 뒤에 (사진 제공: 홍길동)처럼 괄호를 붙이면 작게 따로 표시됩니다." }
+              - { label: "사진", name: "image", widget: "image" }
+
   - name: "announce"
     label: "접속 시 팝업"
     files:

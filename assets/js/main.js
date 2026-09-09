@@ -233,8 +233,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const lightbox = document.getElementById("lightbox");
   const lightboxImg = document.getElementById("lightboxImg");
   const lightboxCap = document.getElementById("lightboxCap");
-  if (lightbox && lightboxImg && lightboxCap) {
-    document.querySelectorAll(".gallery-item").forEach((btn) => {
+  function bindGalleryLightbox(root) {
+    if (!lightbox || !lightboxImg || !lightboxCap) return;
+    root.querySelectorAll(".gallery-item").forEach((btn) => {
       btn.addEventListener("click", () => {
         const imgUrl = btn.dataset.img;
         if (imgUrl) {
@@ -256,12 +257,144 @@ document.addEventListener("DOMContentLoaded", () => {
         lightbox.classList.add("open");
       });
     });
+  }
+  if (lightbox && lightboxImg && lightboxCap) {
     const closeBtn = document.getElementById("lightboxClose");
     if (closeBtn) closeBtn.addEventListener("click", () => lightbox.classList.remove("open"));
     lightbox.addEventListener("click", (e) => {
       if (e.target === lightbox) lightbox.classList.remove("open");
     });
   }
+
+  // 갤러리 — content/gallery.json에서 불러와 채움 (관리자 페이지에서 편집)
+  (function () {
+    const grid = document.getElementById("galleryGrid");
+    const yearTabsEl = document.getElementById("galleryYearTabs");
+    const pagination = document.querySelector(".gallery-pagination");
+    if (!grid || !yearTabsEl || !pagination) return;
+
+    fetch("content/gallery.json")
+      .then((res) => res.json())
+      .then((data) => {
+        const items = (data && data.items) || [];
+        const PAGE_SIZE = 8;
+        const DECADES = [2020, 2010, 2000, 1990, 1980, 1970, 1960];
+
+        function decadeOf(dateStr) {
+          const y = parseInt(String(dateStr || "").slice(0, 4), 10);
+          return Number.isNaN(y) ? null : Math.floor(y / 10) * 10;
+        }
+
+        const decadesAvailable = new Set(items.map((item) => decadeOf(item.date)));
+        let currentDecade = DECADES.find((d) => decadesAvailable.has(d));
+        if (currentDecade === undefined) currentDecade = DECADES[0];
+        let currentPage = 1;
+
+        function renderYearTabs() {
+          yearTabsEl.innerHTML = "";
+          DECADES.forEach((decade) => {
+            const has = decadesAvailable.has(decade);
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "year-tab" + (decade === currentDecade ? " active" : "");
+            btn.textContent = decade + "년대";
+            if (has) {
+              btn.addEventListener("click", () => {
+                currentDecade = decade;
+                renderYearTabs();
+                renderGrid(1);
+              });
+            } else {
+              btn.disabled = true;
+              btn.title = "자료 준비 중";
+            }
+            yearTabsEl.appendChild(btn);
+          });
+        }
+
+        function renderGrid(page) {
+          const filtered = items.filter((item) => decadeOf(item.date) === currentDecade);
+          const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+          currentPage = Math.min(Math.max(1, page), totalPages);
+          grid.innerHTML = "";
+          if (!filtered.length) {
+            grid.innerHTML = '<div class="bulletin-empty-note">아직 등록된 사진이 없습니다. 자료가 확보되는 대로 추가하겠습니다.</div>';
+            renderPagination(0);
+            return;
+          }
+          const start = (currentPage - 1) * PAGE_SIZE;
+          filtered.slice(start, start + PAGE_SIZE).forEach((item) => {
+            const parenMatch = String(item.title || "").match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+            const titleMain = parenMatch ? parenMatch[1] : item.title || "";
+            const titleExtra = parenMatch
+              ? `<span class="gallery-cap-extra">(${escapeHtml(parenMatch[2])})</span>`
+              : "";
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "gallery-item";
+            btn.dataset.caption = item.title || "";
+            if (item.image) btn.dataset.img = item.image;
+            btn.innerHTML = `
+              <div class="gallery-thumb placeholder-photo placeholder-photo--photo">
+                ${item.image ? `<img src="${item.image}" alt="${escapeHtml(item.title || "")}" loading="lazy">` : ""}
+              </div>
+              <div class="gallery-cap"><span class="gallery-cap-date">${escapeHtml(item.date || "")}</span><span class="gallery-cap-title">${escapeHtml(titleMain)}</span>${titleExtra}</div>
+            `;
+            grid.appendChild(btn);
+          });
+          bindGalleryLightbox(grid);
+          renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+          pagination.innerHTML = "";
+          if (totalPages <= 1) return;
+          const addBtn = (label, page, opts = {}) => {
+            const b = document.createElement("button");
+            b.type = "button";
+            b.textContent = label;
+            if (opts.active) b.classList.add("active");
+            if (opts.disabled) {
+              b.disabled = true;
+            } else {
+              b.addEventListener("click", () => {
+                renderGrid(page);
+                document.getElementById("gallery").scrollIntoView({ behavior: "smooth", block: "start" });
+              });
+            }
+            pagination.appendChild(b);
+          };
+          const addEllipsis = () => {
+            const span = document.createElement("span");
+            span.className = "ellipsis";
+            span.textContent = "…";
+            pagination.appendChild(span);
+          };
+
+          addBtn("처음", 1, { disabled: currentPage === 1 });
+          addBtn("이전", currentPage - 1, { disabled: currentPage === 1 });
+
+          const WINDOW = 2;
+          const pagesToShow = new Set([1, totalPages]);
+          for (let p = currentPage - WINDOW; p <= currentPage + WINDOW; p++) {
+            if (p >= 1 && p <= totalPages) pagesToShow.add(p);
+          }
+          let prev = 0;
+          [...pagesToShow].sort((a, b) => a - b).forEach((p) => {
+            if (p - prev > 1) addEllipsis();
+            addBtn(String(p), p, { active: p === currentPage });
+            prev = p;
+          });
+
+          addBtn("다음", currentPage + 1, { disabled: currentPage === totalPages });
+          addBtn("마지막", totalPages, { disabled: currentPage === totalPages });
+        }
+
+        renderYearTabs();
+        renderGrid(1);
+      })
+      .catch(() => {});
+  })();
 
   // 카카오맵 — 오시는 길
   const mapEl = document.getElementById("locMap");
