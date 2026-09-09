@@ -6,6 +6,17 @@
   if (!btn || !modal) return;
 
   const STORAGE_KEY = 'seohakdong-push-subscribed';
+  const TOKEN_STORAGE_KEY = 'seohakdong-push-token';
+
+  // 토큰을 새로 받을 때마다 이전 토큰의 Firestore 기록을 같이 지워서,
+  // 이미 무효해진 옛날 토큰이 계속 쌓여있다가 발송할 때마다 실패로 잡히는 일을 막는다
+  async function replaceStoredToken(db, newToken) {
+    const previousToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+    if (previousToken && previousToken !== newToken) {
+      await db.collection('push_tokens').doc(previousToken).delete().catch(() => {});
+    }
+    localStorage.setItem(TOKEN_STORAGE_KEY, newToken);
+  }
 
   const supported = 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window
     && window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey !== 'REPLACE_ME'
@@ -78,10 +89,12 @@
         await messaging.deleteToken().catch(() => {});
         const token = await messaging.getToken({ vapidKey: window.FIREBASE_VAPID_KEY, serviceWorkerRegistration: reg });
         if (token) {
-          await firebase.firestore().collection('push_tokens').doc(token).set({
+          const db = firebase.firestore();
+          await db.collection('push_tokens').doc(token).set({
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             ua: navigator.userAgent
           });
+          await replaceStoredToken(db, token);
         }
       } catch (err) {
         console.error('토큰 갱신 실패', err);
@@ -115,6 +128,7 @@
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         ua: navigator.userAgent
       });
+      await replaceStoredToken(db, token);
 
       localStorage.setItem(STORAGE_KEY, '1');
       setLabel('알림 받는 중 ✓', true);
@@ -139,6 +153,7 @@
       }
     } finally {
       localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
       btn.classList.remove('is-subscribed');
       setLabel('🔕 알림 꺼짐', true);
     }
