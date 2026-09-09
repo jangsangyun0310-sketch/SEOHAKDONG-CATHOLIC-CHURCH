@@ -74,15 +74,46 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 공지사항 아코디언
-  document.querySelectorAll(".notice-item").forEach((item) => {
-    const row = item.querySelector(".notice-row");
-    const body = item.querySelector(".notice-body");
-    if (!row || !body) return;
-    row.addEventListener("click", () => {
-      const isOpen = item.classList.toggle("open");
-      body.style.maxHeight = isOpen ? body.scrollHeight + "px" : null;
+  function bindNoticeAccordions(root) {
+    root.querySelectorAll(".notice-item").forEach((item) => {
+      const row = item.querySelector(".notice-row");
+      const body = item.querySelector(".notice-body");
+      if (!row || !body) return;
+      row.addEventListener("click", () => {
+        const isOpen = item.classList.toggle("open");
+        body.style.maxHeight = isOpen ? body.scrollHeight + "px" : null;
+      });
     });
-  });
+  }
+  bindNoticeAccordions(document);
+
+  // 공지사항 목록 — content/notices.json에서 불러와 채움 (관리자 페이지에서 편집)
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, (c) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+    }[c]));
+  }
+  const noticeList = document.getElementById("noticeList");
+  if (noticeList) {
+    fetch("content/notices.json")
+      .then((res) => res.json())
+      .then((data) => {
+        const items = (data && data.items) || [];
+        noticeList.innerHTML = items.map((n) => `
+          <div class="notice-item">
+            <button class="notice-row">
+              <span class="notice-tag">${escapeHtml(n.tag || "")}</span>
+              <span class="notice-title">${escapeHtml(n.title || "")}</span>
+              <span class="notice-date">${escapeHtml(n.date || "")}</span>
+              <span class="notice-plus"></span>
+            </button>
+            <div class="notice-body"><div class="notice-body-inner">${escapeHtml(n.body || "").replace(/\n/g, "<br>")}</div></div>
+          </div>
+        `).join("");
+        bindNoticeAccordions(noticeList);
+      })
+      .catch(() => {});
+  }
 
   // 갤러리 라이트박스
   const lightbox = document.getElementById("lightbox");

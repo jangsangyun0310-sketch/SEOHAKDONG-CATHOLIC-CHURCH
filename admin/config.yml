@@ -1,0 +1,41 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# 관리자 로그인은 Netlify Identity로 처리됩니다.
+# 설정 방법은 프로젝트 담당자에게 문의하세요 (Netlify에 이 저장소를 연결하고
+# Identity + Git Gateway를 켠 뒤, 관리자 이메일을 초대하면 됩니다).
+
+media_folder: "assets/img"
+public_folder: "assets/img"
+
+collections:
+  - name: "notices"
+    label: "공지사항"
+    files:
+      - name: "notices"
+        label: "공지사항 목록"
+        file: "content/notices.json"
+        fields:
+          - label: "공지 목록"
+            name: "items"
+            widget: "list"
+            label_singular: "공지"
+            summary: "{{title}} ({{date}})"
+            fields:
+              - { label: "태그 (예: 공지, 모집, 안내)", name: "tag", widget: "string" }
+              - { label: "제목", name: "title", widget: "string" }
+              - { label: "날짜 (예: 2026.09.06)", name: "date", widget: "string" }
+              - { label: "본문", name: "body", widget: "text" }
+
+  - name: "announce"
+    label: "접속 시 팝업"
+    files:
+      - name: "announce"
+        label: "공지·행사 안내 팝업"
+        file: "content/announce.json"
+        fields:
+          - { label: "팝업 켜기", name: "active", widget: "boolean", default: true, hint: "끄면 접속 시 팝업이 뜨지 않습니다." }
+          - { label: "제목", name: "title", widget: "string" }
+          - { label: "본문", name: "text", widget: "text" }
+          - { label: "사진 (선택)", name: "image", widget: "image", required: false }
