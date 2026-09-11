@@ -3,7 +3,7 @@
 // Netlify 환경변수(FIREBASE_SERVICE_ACCOUNT)에 저장해 사용한다.
 const admin = require('firebase-admin');
 
-const SITE_URL = 'https://jangsangyun0310-sketch.github.io/SEOHAKDONG-CATHOLIC-CHURCH/';
+const SITE_URL = 'https://helpful-peony-450edf.netlify.app/';
 
 function getApp() {
   if (admin.apps.length) return admin.app();
