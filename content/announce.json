@@ -1,6 +1,6 @@
 {
   "active": true,
-  "title": "테스트 팝업",
-  "text": "팝업창 기능 테스트입니다.\n실제로 쓰실 때는 이 제목/본문/사진을 공지 내용으로 바꿔주세요.",
-  "image": "assets/img/church-exterior.jpg"
+  "title": "추석 미사시간 안내",
+  "text": "추석 미사시간을 안내해 드립니다.",
+  "image": "assets/img/priest-hwang.jpg"
 }
