@@ -1,16 +1,16 @@
 // Fetches today's Korean Catholic liturgical info from the official 가톨릭굿뉴스
-// daily-mass page and updates the "오늘의 말씀" strip in index.html.
+// daily-mass page and writes it to Firestore (site_data/todayword), which the
+// homepage reads client-side. This intentionally does NOT touch index.html or
+// git-commit anything, so this daily run never triggers a Netlify redeploy
+// (each redeploy costs Netlify build credits; a Firestore write does not).
 //
 // Safety rule: if any expected value cannot be extracted with confidence,
-// this script exits with an error and leaves the HTML file untouched —
-// it never guesses, paraphrases, or reuses a stale value for public-facing
-// liturgical text.
+// this script exits with an error and leaves Firestore untouched — it never
+// guesses, paraphrases, or reuses a stale value for public-facing liturgical text.
 
-const fs = require('fs');
-const path = require('path');
+const admin = require('firebase-admin');
 
 const SOURCE_URL = 'https://maria.catholic.or.kr/mobile/missa/missa_view.asp?today=on';
-const HTML_PATH = path.join(__dirname, '..', '..', 'index.html');
 
 function fail(reason) {
   console.error(`FAIL: ${reason}`);
@@ -51,42 +51,19 @@ async function main() {
 
   console.log('Extracted:', JSON.stringify({ ym, day, color, feastName, verse }, null, 2));
 
-  let file = fs.readFileSync(HTML_PATH, 'utf8');
-  const blockMatch = file.match(/<!-- TODAYWORD:AUTO-UPDATED[\s\S]*?<!-- \/TODAYWORD -->/);
-  if (!blockMatch) fail('could not find the <!-- TODAYWORD:AUTO-UPDATED --> ... <!-- /TODAYWORD --> block in the HTML file');
-  let block = blockMatch[0];
-  const original = block;
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
-  const replaceTag = (src, id, attr, newValue) => {
-    const tagRe = new RegExp(`(<[a-zA-Z0-9]+ [^>]*id="${id}"[^>]*>)([\\s\\S]*?)(</[a-zA-Z0-9]+>)`);
-    const m = src.match(tagRe);
-    if (!m) fail(`could not find element with id="${id}" inside the TODAYWORD block`);
-    let openTag = m[1];
-    if (attr) {
-      const attrRe = new RegExp(`${attr}="[^"]*"`);
-      if (!attrRe.test(openTag)) fail(`element id="${id}" is missing the "${attr}" attribute`);
-      openTag = openTag.replace(attrRe, `${attr}="${newValue}"`);
-    }
-    return src.replace(tagRe, `${openTag}${newValue}${m[3]}`);
-  };
+  await admin.firestore().collection('site_data').doc('todayword').set({
+    ym,
+    day,
+    color,
+    feastName,
+    verse,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
 
-  block = replaceTag(block, 'liturgyYm', null, ym);
-  block = replaceTag(block, 'liturgyDay', null, day);
-  block = replaceTag(block, 'liturgyColor', 'data-color', color);
-  block = replaceTag(block, 'liturgyFeast', null, feastName);
-  block = replaceTag(block, 'liturgyVerse', null, verse);
-
-  if (block === original) {
-    console.log('No change: today\'s values already match the file. Nothing to commit.');
-    process.exit(0);
-  }
-
-  file = file.replace(original, block);
-  fs.writeFileSync(HTML_PATH, file, 'utf8');
-  console.log('Updated index.html');
-  if (process.env.GITHUB_OUTPUT) {
-    fs.appendFileSync(process.env.GITHUB_OUTPUT, 'changed=true\n');
-  }
+  console.log('Updated Firestore site_data/todayword');
 }
 
 main().catch((err) => fail(err.stack || String(err)));

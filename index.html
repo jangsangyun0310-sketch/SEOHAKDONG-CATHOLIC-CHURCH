@@ -71,7 +71,8 @@
     <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false"><span></span></button>
   </div>
 
-  <!-- TODAYWORD:AUTO-UPDATED daily at 00:00 KST — edit only the text inside the id="liturgy*" tags below -->
+  <!-- 아래 날짜/전례색/말씀은 매일 자동으로 Firestore(site_data/todayword)에서 불러와 채워집니다 (assets/js/todayword.js).
+       아래 값들은 그 전에 잠깐 보이는 기본값이며, 자동 갱신 때문에 이 파일이 커밋되는 일은 없습니다. -->
   <div class="liturgy-strip">
     <div class="container liturgy-row">
       <div class="liturgy-date">
@@ -86,7 +87,6 @@
       <a href="https://maria.catholic.or.kr/mobile/missa/missa_view.asp?today=on" target="_blank" rel="noopener" class="btn btn--outline liturgy-cta">오늘의 미사 보기</a>
     </div>
   </div>
-  <!-- /TODAYWORD -->
 </header>
 
 <!-- 히어로 -->
@@ -442,6 +442,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="assets/js/push-config.js?v=202609098"></script>
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=cbcb370204a8f8c4a89fb47c6e001a5f&libraries=services&autoload=false"></script>
+<script src="assets/js/todayword.js?v=202609121"></script>
 <script src="assets/js/main.js?v=202609098"></script>
 <script src="assets/js/push.js?v=202609099"></script>
 <script src="assets/js/notif-inbox.js?v=202609098"></script>
