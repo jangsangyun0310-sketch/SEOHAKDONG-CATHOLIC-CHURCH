@@ -385,18 +385,25 @@
     show('viewSection');
     if (name === 'push') { renderPush(); return; }
     if (name === 'admins') { renderAdmins(); return; }
+    data = null;
+    $('addBtn').disabled = true;
     busy('불러오는 중입니다…');
     try {
       data = (await api('content?name=' + name)).data;
+      $('addBtn').disabled = false;
       renderList();
     } catch (err) {
       setStatus('err', '불러오기 실패: ' + err.message);
+      // 목록을 못 불러온 상태에서 저장하면 기존 내용을 덮어쓸 수 있으므로, 다시 불러오기만 허용한다
+      $('sectionBody').innerHTML = '<div class="empty"><button type="button" class="btn btn--outline" id="retryLoadBtn">다시 불러오기</button></div>';
+      $('retryLoadBtn').addEventListener('click', () => openSection(name));
     } finally { unbusy(); }
   }
-  $('addBtn').addEventListener('click', () => renderForm(-1));
+  $('addBtn').addEventListener('click', () => { if (data) renderForm(-1); });
 
   // 저장: 항목 전체를 한 번에 서버로 보내 GitHub에 커밋한다
   async function saveContent(newData, blobs) {
+    if (!data) { setStatus('err', '목록을 먼저 불러와야 합니다. "← 처음으로"를 눌렀다가 다시 들어와 주세요.'); return; }
     busy('저장하는 중입니다… (사진이 있으면 조금 걸립니다)');
     try {
       const res = await apiJson('save', { name: section, data: newData, blobs: blobs || [] });
