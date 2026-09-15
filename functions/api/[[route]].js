@@ -350,6 +350,7 @@ export async function onRequest(context) {
       firebase_service_account: !!env.FIREBASE_SERVICE_ACCOUNT,
       repo: cfg(env, 'GITHUB_REPO'),
       branch: cfg(env, 'GITHUB_BRANCH'),
+      version: '2026-09-15b',
     });
   }
 
