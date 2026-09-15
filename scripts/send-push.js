@@ -5,7 +5,7 @@
 const path = require('path');
 const admin = require('firebase-admin');
 
-const SITE_URL = 'https://helpful-peony-450edf.netlify.app/';
+const SITE_URL = 'https://seohakdong-church.pages.dev/';
 
 let serviceAccount;
 try {

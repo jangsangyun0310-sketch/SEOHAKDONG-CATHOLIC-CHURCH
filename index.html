@@ -10,8 +10,8 @@
 <meta property="og:site_name" content="서학동성당">
 <meta property="og:title" content="전주 서학동성당 | 천주교 전주교구">
 <meta property="og:description" content="1968년 설립, 예수·마리아·요셉의 성가정을 주보로 모시는 천주교 전주교구 서학동성당 공식 홈페이지입니다. 한옥마을에서 가까운 신앙공동체.">
-<meta property="og:url" content="https://helpful-peony-450edf.netlify.app/">
-<meta property="og:image" content="https://helpful-peony-450edf.netlify.app/assets/img/og-logo.png">
+<meta property="og:url" content="https://seohakdong-church.pages.dev/">
+<meta property="og:image" content="https://seohakdong-church.pages.dev/assets/img/og-logo.png">
 <meta property="og:image:width" content="1254">
 <meta property="og:image:height" content="1254">
 
@@ -30,7 +30,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
-<link rel="stylesheet" href="assets/css/style.css?v=202609098">
+<link rel="stylesheet" href="assets/css/style.css?v=202609150">
 </head>
 <body id="top">
 
@@ -321,6 +321,11 @@
   </div>
 </section>
 
+<!-- 관리자 진입: 아래 작은 글자는 누구나 보이지만, "관리" 버튼은 구글 로그인한 관리자에게만 나타난다 -->
+<p class="admin-entry"><a href="admin/">관리자</a></p>
+
+<a href="admin/" class="admin-fab" id="adminFab" hidden>✏️ 관리</a>
+
 <div class="lightbox" id="lightbox">
   <div class="lightbox-inner">
     <div class="lightbox-img placeholder-photo" id="lightboxImg">사진 준비중</div>
@@ -440,26 +445,16 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="assets/js/push-config.js?v=202609098"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="assets/js/push-config.js?v=202609150"></script>
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=cbcb370204a8f8c4a89fb47c6e001a5f&libraries=services&autoload=false"></script>
 <script src="assets/js/todayword.js?v=202609121"></script>
 <script src="assets/js/main.js?v=202609098"></script>
-<script src="assets/js/push.js?v=202609099"></script>
+<script src="assets/js/push.js?v=202609150"></script>
 <script src="assets/js/notif-inbox.js?v=202609098"></script>
 <script src="assets/js/announce-modal.js?v=202609099"></script>
-<!-- 관리자 초대·비밀번호 재설정 메일 링크를 처리하기 위한 스크립트 (admin/ 페이지 로그인용) -->
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", (user) => {
-      if (!user) {
-        window.netlifyIdentity.on("login", () => {
-          document.location.href = "/admin/";
-        });
-      }
-    });
-  }
-</script>
+<!-- 구글 로그인한 관리자에게만 "관리" 버튼을 보여준다 (admin/ 관리자 페이지로 연결) -->
+<script src="assets/js/admin-link.js?v=202609150"></script>
 <script>
   // "홈 화면에 추가" — 신자분들이 앱처럼 바로 들어올 수 있도록 안내
   (function () {

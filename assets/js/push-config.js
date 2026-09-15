@@ -13,3 +13,7 @@ window.FIREBASE_CONFIG = {
 
 // Firebase 콘솔 > 프로젝트 설정 > 클라우드 메시징 > 웹 구성 > "웹 푸시 인증서" 에서 키 쌍을 생성하면 나오는 값
 window.FIREBASE_VAPID_KEY = "BEy7c9Fwfyl0WDP-n_ZYCPEGHNgO8WNUTrbQ3xmpadJMyEZeF7PvqWHfJd16PEoiYiiiuTua59rKORXK44RKt1A";
+
+// 대표 관리자 구글 계정. 이 계정은 Firestore admins 명단에 없어도 항상 관리자로 취급되며,
+// 관리자 페이지에서 다른 관리자를 추가·삭제할 수 있는 유일한 계정이다.
+window.SITE_OWNER_EMAIL = "jangsangyun0310@gmail.com";

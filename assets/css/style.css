@@ -2511,3 +2511,41 @@ tr:last-child td { border-bottom: none; }
   .grid--3, .grid--4, .grid--2 { grid-template-columns: 1fr; }
   .info-list dl { grid-template-columns: 100px 1fr; }
 }
+
+/* ---------- 관리자 진입 ---------- */
+/* 화면 맨 아래의 작은 글자 링크 — 관리자가 처음 로그인하러 들어가는 곳 */
+.admin-entry {
+  text-align: center;
+  padding: 8px 0 28px;
+  font-size: 12px;
+}
+.admin-entry a {
+  color: var(--color-ink-soft);
+  opacity: .55;
+  text-decoration: none;
+}
+.admin-entry a:hover { opacity: 1; text-decoration: underline; }
+
+/* 로그인한 관리자에게만 보이는 "관리" 버튼 (알림 받기 버튼 위에 자리) */
+.admin-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 76px;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 16px;
+  border-radius: 999px;
+  background: var(--color-sumi);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--shadow-soft);
+}
+.admin-fab:hover { opacity: .9; }
+.admin-fab[hidden] { display: none; }
+@media (max-width: 640px) {
+  .admin-fab { right: 12px; bottom: 68px; padding: 10px 14px; font-size: 13px; }
+}

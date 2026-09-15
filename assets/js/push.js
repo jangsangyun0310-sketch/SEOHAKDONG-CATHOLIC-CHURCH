@@ -54,7 +54,7 @@
 
   let firebaseApp = null;
   function getFirebaseApp() {
-    if (!firebaseApp) firebaseApp = firebase.initializeApp(window.FIREBASE_CONFIG);
+    if (!firebaseApp) firebaseApp = firebase.apps.length ? firebase.apps[0] : firebase.initializeApp(window.FIREBASE_CONFIG);
     return firebaseApp;
   }
 
