@@ -350,7 +350,7 @@ export async function onRequest(context) {
       firebase_service_account: !!env.FIREBASE_SERVICE_ACCOUNT,
       repo: cfg(env, 'GITHUB_REPO'),
       branch: cfg(env, 'GITHUB_BRANCH'),
-      env_keys: Object.keys(env || {}).map((k) => '[' + k + ']'),
+      env_keys: Object.keys(env || {}).map((k) => '[' + k + ']' + ''),
     });
   }
 
