@@ -100,6 +100,15 @@
   .note { background: var(--ivory-deep); border-radius: 10px; padding: 12px 14px; color: var(--ink-soft); font-size: .9rem; margin-bottom: 16px; }
   .row { display: flex; gap: 10px; }
   .row input { flex: 1; }
+  .album-photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+  .album-photo { position: relative; aspect-ratio: 1; }
+  .album-photo img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); display: block; }
+  .album-photo-x {
+    position: absolute; top: -8px; right: -8px; width: 32px; height: 32px; border-radius: 999px;
+    border: 2px solid #fff; background: var(--danger); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .album-photo.is-removed img { opacity: .3; }
+  .album-photo.is-removed .album-photo-x { background: var(--wine); }
   .overlay { position: fixed; inset: 0; background: rgba(24,20,16,.55); z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; }
   .overlay .box { background: #fff; border-radius: 16px; padding: 22px 20px; max-width: 420px; width: 100%; text-align: center; font-size: 1.05rem; }
   @media (max-width: 480px) {
@@ -422,9 +431,22 @@
   function sortByDateDesc(items) {
     return items.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
   }
+  // 갤러리: 같은 날짜·같은 제목의 사진을 하나의 앨범으로 묶는다
+  function albumKey(it) { return (it.date || '') + '|' + (it.title || ''); }
+  function groupAlbums(items) {
+    const map = new Map();
+    items.forEach((it, i) => {
+      const k = albumKey(it);
+      if (!map.has(k)) map.set(k, { key: k, date: it.date || '', title: it.title || '', photos: [] });
+      map.get(k).photos.push({ index: i, image: it.image || '' });
+    });
+    return [...map.values()];
+  }
+
   function renderList() {
     const body = $('sectionBody');
     if (section === 'announce') { renderAnnounceForm(); return; }
+    if (section === 'gallery') { renderAlbumList(); return; }
     const items = data.items || [];
     if (!items.length) {
       body.innerHTML = '<div class="empty">아직 등록된 내용이 없습니다.<br>오른쪽 위 "새로 추가"를 눌러주세요.</div>';
@@ -454,8 +476,114 @@
     }));
   }
 
-  // ---------- 추가/수정 폼 (공지사항·주보·갤러리) ----------
+  // ---------- 갤러리 앨범 목록 ----------
+  function renderAlbumList() {
+    const body = $('sectionBody');
+    const items = data.items || [];
+    const albums = groupAlbums(items).sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    if (!albums.length) {
+      body.innerHTML = '<div class="empty">아직 등록된 사진이 없습니다.<br>오른쪽 위 "새로 추가"를 눌러주세요.</div>';
+      return;
+    }
+    body.innerHTML = '<div class="list">' + albums.map((al) => {
+      const cover = al.photos.find((p) => p.image);
+      return `
+      <div class="card">
+        ${cover ? `<img class="thumb" src="../${esc(cover.image)}" alt="">` : '<div class="thumb"></div>'}
+        <div class="main">
+          <div class="title">${esc(al.title || '(제목 없음)')}</div>
+          <div class="meta">${esc(al.date)} · 사진 ${al.photos.length}장</div>
+        </div>
+        <div class="acts">
+          <button type="button" class="btn btn--outline btn--sm" data-album-edit="${esc(al.key)}">수정·사진 추가</button>
+          <button type="button" class="btn btn--danger btn--sm" data-album-del="${esc(al.key)}">앨범 삭제</button>
+        </div>
+      </div>`;
+    }).join('') + '</div>';
+    body.querySelectorAll('[data-album-edit]').forEach((b) => b.addEventListener('click', () => renderAlbumForm(b.dataset.albumEdit)));
+    body.querySelectorAll('[data-album-del]').forEach((b) => b.addEventListener('click', () => {
+      const al = albums.find((a) => a.key === b.dataset.albumDel);
+      if (!al) return;
+      if (!confirm(`"${al.title || al.date}" 앨범의 사진 ${al.photos.length}장을 모두 삭제할까요?`)) return;
+      saveContent({ items: items.filter((it) => albumKey(it) !== al.key) }, []);
+    }));
+  }
+
+  // ---------- 갤러리 앨범 추가/수정 폼 ----------
+  // key가 없으면 새 앨범. 있으면 그 앨범의 날짜·제목 수정, 사진 빼기, 사진 추가.
+  function renderAlbumForm(key) {
+    const isNew = !key;
+    const items = data.items || [];
+    const album = isNew ? { date: '', title: '', photos: [] } : groupAlbums(items).find((a) => a.key === key);
+    if (!album) { renderList(); return; }
+    const body = $('sectionBody');
+    setStatus('', '');
+    const removed = new Set(); // 이 폼에서 ✕ 누른 기존 사진(원래 index)
+    const form = document.createElement('div');
+    form.className = 'form';
+    form.innerHTML = `
+      ${dateField('사진 날짜', album.date)}
+      <label class="f">앨범 제목 <small>행사 이름 등</small></label><input type="text" data-k="title" value="${esc(album.title)}" maxlength="200" placeholder="예: 본당 설립 기념 미사">
+      ${isNew ? '' : '<label class="f">지금 있는 사진 <small>✕를 누르면 그 사진만 빠집니다 (저장해야 반영)</small></label><div class="album-photos" data-existing></div>'}
+      <label class="f">${isNew ? '사진' : '사진 추가'} <small>여러 장 선택 가능</small></label><div data-file></div>
+      <div class="actions"><button type="button" class="btn" data-save>저장</button><button type="button" class="btn btn--outline" data-cancel>취소</button></div>`;
+    body.innerHTML = '';
+    body.appendChild(form);
+
+    const existingEl = form.querySelector('[data-existing]');
+    if (existingEl) {
+      album.photos.forEach((p) => {
+        const wrap = document.createElement('div');
+        wrap.className = 'album-photo';
+        wrap.innerHTML = `<img src="../${esc(p.image)}" alt=""><button type="button" class="album-photo-x" aria-label="이 사진 빼기">✕</button>`;
+        wrap.querySelector('button').addEventListener('click', () => {
+          if (removed.has(p.index)) { removed.delete(p.index); wrap.classList.remove('is-removed'); }
+          else { removed.add(p.index); wrap.classList.add('is-removed'); }
+        });
+        existingEl.appendChild(wrap);
+      });
+    }
+
+    const fb = fileBox({ multiple: true, current: '', maxSide: 1600, quality: 0.82, allowRemove: false });
+    form.querySelector('[data-file]').replaceWith(fb.el);
+    const val = (k) => { const el = form.querySelector(`[data-k="${k}"]`); return el ? el.value.trim() : ''; };
+
+    form.querySelector('[data-cancel]').addEventListener('click', renderList);
+    form.querySelector('[data-save]').addEventListener('click', async () => {
+      const date = isoToDots(val('date'));
+      if (!date) { alert('날짜를 골라주세요.'); return; }
+      const title = val('title');
+      if (!title) { alert('앨범 제목을 적어주세요.'); return; }
+      const keptCount = album.photos.length - removed.size;
+      if (isNew && !fb.state.pending.length) { alert('사진을 골라주세요.'); return; }
+      if (!isNew && keptCount + fb.state.pending.length === 0) { alert('사진이 한 장도 남지 않습니다. 앨범을 없애려면 목록에서 "앨범 삭제"를 눌러주세요.'); return; }
+
+      busy('저장하는 중입니다… (사진이 있으면 조금 걸립니다)');
+      try {
+        const blobs = [];
+        const uploaded = [];
+        for (let i = 0; i < fb.state.pending.length; i++) {
+          $('busyText').textContent = `사진 올리는 중… (${i + 1}/${fb.state.pending.length})`;
+          const u = await uploadImage(fb.state.pending[i].base64);
+          blobs.push(u); uploaded.push(u.path);
+        }
+        // 이 앨범에 속하지 않는 사진은 그대로 두고, 앨범 사진은 새 날짜·제목으로 다시 넣는다
+        const albumIdx = new Set(album.photos.map((p) => p.index));
+        const others = items.filter((_, i) => !albumIdx.has(i));
+        const kept = album.photos.filter((p) => !removed.has(p.index)).map((p) => ({ date, title, image: p.image }));
+        const added = uploaded.map((p) => ({ date, title, image: p }));
+        unbusy();
+        await saveContent({ items: [...kept, ...added, ...others] }, blobs);
+      } catch (err) {
+        unbusy();
+        setStatus('err', '저장 실패: ' + err.message);
+      }
+    });
+  }
+
+  // ---------- 추가/수정 폼 (공지사항·주보) ----------
   function renderForm(index) {
+    if (section === 'gallery') { renderAlbumForm(index < 0 ? '' : index); return; }
     const isNew = index < 0;
     const item = isNew ? {} : data.items[index];
     const body = $('sectionBody');
@@ -474,11 +602,6 @@
         ${dateField('주보 날짜 (주일)', item.date)}
         <label class="f">제목 <small>예: 연중 제23주일</small></label><input type="text" data-k="title" value="${esc(item.title || '')}" maxlength="120">
         <label class="f">주보 사진 <small>앞면·뒷면 등 여러 장 가능. 새로 고르면 기존 사진은 전부 바뀝니다</small></label><div data-file></div>`;
-    } else if (section === 'gallery') {
-      html = `
-        ${dateField('사진 날짜', item.date)}
-        <label class="f">제목 <small>사진 설명</small></label><input type="text" data-k="title" value="${esc(item.title || '')}" maxlength="200" placeholder="예: 본당 설립 기념 미사">
-        <label class="f">사진${isNew ? ' <small>여러 장 선택 가능</small>' : ''}</label><div data-file></div>`;
     }
     html += `<div class="actions"><button type="button" class="btn" data-save>저장</button><button type="button" class="btn btn--outline" data-cancel>취소</button></div>`;
     form.innerHTML = html;
@@ -488,13 +611,9 @@
     let fb = null;
     const fileSlot = form.querySelector('[data-file]');
     if (fileSlot) {
-      const opts = section === 'bulletins'
-        ? { maxSide: 2000, quality: 0.85, multiple: true }
-        : { maxSide: 1600, quality: 0.82, multiple: isNew };
-      const currentImages = section === 'bulletins'
-        ? (item.images && item.images.length ? item.images : (item.image ? [item.image] : []))
-        : (item.image || '');
-      fb = fileBox({ ...opts, current: currentImages, allowRemove: false });
+      // 주보: 앞면·뒷면 등 여러 장, 기존 사진은 모두 미리보기
+      const currentImages = item.images && item.images.length ? item.images : (item.image ? [item.image] : []);
+      fb = fileBox({ maxSide: 2000, quality: 0.85, multiple: true, current: currentImages, allowRemove: false });
       fileSlot.replaceWith(fb.el);
     }
     const val = (k) => { const el = form.querySelector(`[data-k="${k}"]`); return el ? el.value.trim() : ''; };
@@ -505,7 +624,6 @@
       if (!date) { alert('날짜를 골라주세요.'); return; }
       const title = val('title');
       if (!title) { alert('제목을 적어주세요.'); return; }
-      if (section === 'gallery' && isNew && !fb.state.pending.length) { alert('사진을 골라주세요.'); return; }
 
       busy('저장하는 중입니다… (사진이 있으면 조금 걸립니다)');
       try {
@@ -526,12 +644,6 @@
           const images = uploaded.length ? uploaded : (item.images && item.images.length ? item.images : (item.image ? [item.image] : []));
           const b = { date, title, image: images[0] || '', images };
           if (isNew) items.unshift(b); else items[index] = b;
-        } else if (section === 'gallery') {
-          if (isNew) {
-            uploaded.forEach((p) => items.unshift({ date, title, image: p }));
-          } else {
-            items[index] = { date, title, image: uploaded[0] || item.image || '' };
-          }
         }
         unbusy();
         await saveContent({ items }, blobs);

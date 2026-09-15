@@ -206,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // 주보는 앞면·뒷면 등 여러 장일 수 있어, 잘리지 않게 원래 비율로 위아래로 이어 붙여 보여준다
           const images = Array.isArray(item.images) && item.images.length ? item.images : (item.image ? [item.image] : []);
           lightboxImg.innerHTML = "";
-          lightboxImg.classList.remove("placeholder-photo");
+          lightboxImg.classList.remove("placeholder-photo", "lightbox-img--viewer");
           lightboxImg.classList.toggle("lightbox-img--pages", images.length > 0);
           if (images.length) {
             images.forEach((src, i) => {
@@ -232,35 +232,51 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(() => {});
   })();
 
-  // 갤러리 라이트박스
+  // 갤러리 앨범 뷰어 — 사진을 크게 띄우고 ◀ ▶ 버튼·손가락 넘기기로 한 장씩 본다
   const lightbox = document.getElementById("lightbox");
   const lightboxImg = document.getElementById("lightboxImg");
   const lightboxCap = document.getElementById("lightboxCap");
-  function bindGalleryLightbox(root) {
+  const viewer = { photos: [], index: 0, caption: "" };
+  function renderViewer() {
+    const total = viewer.photos.length;
+    const photo = viewer.photos[viewer.index];
+    lightboxImg.classList.remove("lightbox-img--pages", "placeholder-photo");
+    lightboxImg.classList.add("lightbox-img--viewer");
+    lightboxImg.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = photo.image;
+    img.alt = photo.title || "";
+    img.className = "lightbox-photo";
+    lightboxImg.appendChild(img);
+    if (total > 1) {
+      const prev = document.createElement("button");
+      prev.type = "button"; prev.className = "lb-nav lb-nav--prev"; prev.setAttribute("aria-label", "이전 사진"); prev.textContent = "‹";
+      prev.addEventListener("click", (e) => { e.stopPropagation(); stepViewer(-1); });
+      const next = document.createElement("button");
+      next.type = "button"; next.className = "lb-nav lb-nav--next"; next.setAttribute("aria-label", "다음 사진"); next.textContent = "›";
+      next.addEventListener("click", (e) => { e.stopPropagation(); stepViewer(1); });
+      const counter = document.createElement("span");
+      counter.className = "lb-counter"; counter.textContent = `${viewer.index + 1} / ${total}`;
+      lightboxImg.appendChild(prev); lightboxImg.appendChild(next); lightboxImg.appendChild(counter);
+      // 다음 사진을 미리 받아 두면 넘길 때 바로 뜬다
+      const pre = new Image(); pre.src = viewer.photos[(viewer.index + 1) % total].image;
+    }
+    lightboxCap.textContent = viewer.caption + (total > 1 ? ` · ${total}장` : "");
+  }
+  function stepViewer(delta) {
+    const total = viewer.photos.length;
+    if (!total) return;
+    viewer.index = (viewer.index + delta + total) % total;
+    renderViewer();
+  }
+  function openAlbum(album, startIndex) {
     if (!lightbox || !lightboxImg || !lightboxCap) return;
-    root.querySelectorAll(".gallery-item").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const imgUrl = btn.dataset.img;
-        lightboxImg.classList.remove("lightbox-img--pages");
-        if (imgUrl) {
-          lightboxImg.innerHTML = "";
-          lightboxImg.classList.remove("placeholder-photo");
-          const img = document.createElement("img");
-          img.src = imgUrl;
-          img.alt = btn.dataset.caption || "";
-          img.style.width = "100%";
-          img.style.height = "100%";
-          img.style.objectFit = "cover";
-          img.style.display = "block";
-          lightboxImg.appendChild(img);
-        } else {
-          lightboxImg.classList.add("placeholder-photo");
-          lightboxImg.textContent = btn.dataset.caption || "";
-        }
-        lightboxCap.textContent = btn.dataset.caption || "";
-        lightbox.classList.add("open");
-      });
-    });
+    viewer.photos = album.photos.filter((p) => p.image);
+    if (!viewer.photos.length) return;
+    viewer.index = Math.max(0, Math.min(startIndex || 0, viewer.photos.length - 1));
+    viewer.caption = `${album.date || ""} · ${album.titleMain || ""}`;
+    renderViewer();
+    lightbox.classList.add("open");
   }
   if (lightbox && lightboxImg && lightboxCap) {
     const closeBtn = document.getElementById("lightboxClose");
@@ -268,9 +284,25 @@ document.addEventListener("DOMContentLoaded", () => {
     lightbox.addEventListener("click", (e) => {
       if (e.target === lightbox) lightbox.classList.remove("open");
     });
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox.classList.contains("open") || !lightboxImg.classList.contains("lightbox-img--viewer")) return;
+      if (e.key === "ArrowLeft") stepViewer(-1);
+      if (e.key === "ArrowRight") stepViewer(1);
+      if (e.key === "Escape") lightbox.classList.remove("open");
+    });
+    // 손가락으로 옆으로 밀어서 넘기기 (휴대폰)
+    let touchX = null;
+    lightboxImg.addEventListener("touchstart", (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+    lightboxImg.addEventListener("touchend", (e) => {
+      if (touchX === null || !lightboxImg.classList.contains("lightbox-img--viewer")) return;
+      const dx = e.changedTouches[0].clientX - touchX;
+      touchX = null;
+      if (Math.abs(dx) > 40) stepViewer(dx < 0 ? 1 : -1);
+    }, { passive: true });
   }
 
   // 갤러리 — content/gallery.json에서 불러와 채움 (관리자 페이지에서 편집)
+  // 같은 날짜·같은 제목의 사진들은 하나의 "앨범"으로 묶어, 대표 사진 한 장과 장수(+N)만 보여준다.
   (function () {
     const grid = document.getElementById("galleryGrid");
     const yearTabsEl = document.getElementById("galleryYearTabs");
@@ -289,7 +321,25 @@ document.addEventListener("DOMContentLoaded", () => {
           return Number.isNaN(y) ? null : Math.floor(y / 10) * 10;
         }
 
-        const decadesAvailable = new Set(items.map((item) => decadeOf(item.date)));
+        // 앨범 묶기
+        const albumMap = new Map();
+        items.forEach((item) => {
+          const key = `${item.date || ""}|${item.title || ""}`;
+          if (!albumMap.has(key)) {
+            const parenMatch = String(item.title || "").match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+            albumMap.set(key, {
+              date: item.date || "",
+              title: item.title || "",
+              titleMain: parenMatch ? parenMatch[1] : item.title || "",
+              titleExtra: parenMatch ? parenMatch[2] : "",
+              photos: [],
+            });
+          }
+          albumMap.get(key).photos.push(item);
+        });
+        const albums = [...albumMap.values()].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+
+        const decadesAvailable = new Set(albums.map((a) => decadeOf(a.date)));
         let currentDecade = DECADES.find((d) => decadesAvailable.has(d));
         if (currentDecade === undefined) currentDecade = DECADES[0];
         let currentPage = 1;
@@ -317,7 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         function renderGrid(page) {
-          const filtered = items.filter((item) => decadeOf(item.date) === currentDecade);
+          const filtered = albums.filter((a) => decadeOf(a.date) === currentDecade);
           const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
           currentPage = Math.min(Math.max(1, page), totalPages);
           grid.innerHTML = "";
@@ -327,26 +377,25 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
           }
           const start = (currentPage - 1) * PAGE_SIZE;
-          filtered.slice(start, start + PAGE_SIZE).forEach((item) => {
-            const parenMatch = String(item.title || "").match(/^(.*?)\s*\(([^)]+)\)\s*$/);
-            const titleMain = parenMatch ? parenMatch[1] : item.title || "";
-            const titleExtra = parenMatch
-              ? `<span class="gallery-cap-extra">(${escapeHtml(parenMatch[2])})</span>`
+          filtered.slice(start, start + PAGE_SIZE).forEach((album) => {
+            const cover = album.photos.find((p) => p.image);
+            const count = album.photos.filter((p) => p.image).length;
+            const titleExtra = album.titleExtra
+              ? `<span class="gallery-cap-extra">(${escapeHtml(album.titleExtra)})</span>`
               : "";
             const btn = document.createElement("button");
             btn.type = "button";
             btn.className = "gallery-item";
-            btn.dataset.caption = item.title || "";
-            if (item.image) btn.dataset.img = item.image;
             btn.innerHTML = `
               <div class="gallery-thumb placeholder-photo placeholder-photo--photo">
-                ${item.image ? `<img src="${item.image}" alt="${escapeHtml(item.title || "")}" loading="lazy">` : ""}
+                ${cover ? `<img src="${cover.image}" alt="${escapeHtml(album.titleMain)}" loading="lazy">` : ""}
+                ${count > 1 ? `<span class="gallery-count">+${count - 1}</span>` : ""}
               </div>
-              <div class="gallery-cap"><span class="gallery-cap-date">${escapeHtml(item.date || "")}</span><span class="gallery-cap-title">${escapeHtml(titleMain)}</span>${titleExtra}</div>
+              <div class="gallery-cap"><span class="gallery-cap-date">${escapeHtml(album.date)}</span><span class="gallery-cap-title">${escapeHtml(album.titleMain)}</span>${titleExtra}</div>
             `;
+            btn.addEventListener("click", () => openAlbum(album, 0));
             grid.appendChild(btn);
           });
-          bindGalleryLightbox(grid);
           renderPagination(totalPages);
         }
 
