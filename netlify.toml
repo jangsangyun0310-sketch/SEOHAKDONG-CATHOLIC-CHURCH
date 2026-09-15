@@ -1,0 +1,7 @@
+# 예전 Netlify 주소(helpful-peony-450edf.netlify.app)로 들어오는 사람을
+# 새 홈페이지(Cloudflare Pages)로 자동으로 보낸다. 이 파일은 Netlify만 읽는다.
+[[redirects]]
+  from = "/*"
+  to = "https://seohakdong-catholic-church.pages.dev/:splat"
+  status = 301
+  force = true
