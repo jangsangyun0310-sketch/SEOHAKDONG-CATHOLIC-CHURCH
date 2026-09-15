@@ -38,8 +38,15 @@ function json(data, status = 200) {
     headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
   });
 }
+// 환경변수 읽기. 대시보드에서 이름 앞뒤에 빈칸이 섞여 저장된 경우(" GITHUB_TOKEN")도 찾아낸다.
+function getEnv(env, key) {
+  if (!env) return undefined;
+  if (env[key]) return env[key];
+  const found = Object.keys(env).find((k) => k.trim() === key);
+  return found ? env[found] : undefined;
+}
 function cfg(env, key) {
-  return (env && env[key]) || DEFAULTS[key];
+  return getEnv(env, key) || DEFAULTS[key];
 }
 
 // ---------- 관리자 확인 ----------
@@ -84,7 +91,7 @@ async function gh(env, path, options = {}) {
   const res = await fetch(`https://api.github.com${path}`, {
     ...options,
     headers: {
-      Authorization: `Bearer ${env.GITHUB_TOKEN}`,
+      Authorization: `Bearer ${getEnv(env, 'GITHUB_TOKEN')}`,
       Accept: 'application/vnd.github+json',
       'User-Agent': 'seohakdong-church-admin',
       'X-GitHub-Api-Version': '2022-11-28',
@@ -218,8 +225,8 @@ function pemToArrayBuffer(pem) {
   return Uint8Array.from(bin, (c) => c.charCodeAt(0)).buffer;
 }
 async function getServiceAccountToken(env) {
-  if (!env.FIREBASE_SERVICE_ACCOUNT) throw new Error('FIREBASE_SERVICE_ACCOUNT 환경변수가 없습니다.');
-  const sa = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT);
+  if (!getEnv(env, 'FIREBASE_SERVICE_ACCOUNT')) throw new Error('FIREBASE_SERVICE_ACCOUNT 환경변수가 없습니다.');
+  const sa = JSON.parse(getEnv(env, 'FIREBASE_SERVICE_ACCOUNT'));
   const now = Math.floor(Date.now() / 1000);
   const header = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
   const claim = b64url(JSON.stringify({
@@ -346,11 +353,11 @@ export async function onRequest(context) {
   // 설정 점검용(로그인 불필요): 비밀값 자체는 절대 내보내지 않고 "있는지 없는지"만 알려준다
   if (route === 'health' && request.method === 'GET') {
     return json({
-      github_token: !!env.GITHUB_TOKEN,
-      firebase_service_account: !!env.FIREBASE_SERVICE_ACCOUNT,
+      github_token: !!getEnv(env, 'GITHUB_TOKEN'),
+      firebase_service_account: !!getEnv(env, 'FIREBASE_SERVICE_ACCOUNT'),
       repo: cfg(env, 'GITHUB_REPO'),
       branch: cfg(env, 'GITHUB_BRANCH'),
-      version: '2026-09-15c',
+      version: '2026-09-15d',
       env_keys: Object.keys(env || {}).map((k) => k + '(' + k.length + ')'),
     });
   }
@@ -368,12 +375,12 @@ export async function onRequest(context) {
     if (route === 'content' && request.method === 'GET') {
       const name = url.searchParams.get('name');
       if (!CONTENT_FILES[name]) return json({ error: '알 수 없는 항목입니다.' }, 400);
-      if (!env.GITHUB_TOKEN) return json({ error: 'GITHUB_TOKEN 환경변수가 설정되지 않았습니다.' }, 500);
+      if (!getEnv(env, 'GITHUB_TOKEN')) return json({ error: 'GITHUB_TOKEN 환경변수가 설정되지 않았습니다.' }, 500);
       return json({ name, data: await readContentFile(env, name) });
     }
 
     if (route === 'upload' && request.method === 'POST') {
-      if (!env.GITHUB_TOKEN) return json({ error: 'GITHUB_TOKEN 환경변수가 설정되지 않았습니다.' }, 500);
+      if (!getEnv(env, 'GITHUB_TOKEN')) return json({ error: 'GITHUB_TOKEN 환경변수가 설정되지 않았습니다.' }, 500);
       const path = safeUploadPath(request.headers.get('X-Upload-Path'));
       if (!path) return json({ error: '파일 경로가 올바르지 않습니다.' }, 400);
       const base64 = (await request.text()).trim();
@@ -383,7 +390,7 @@ export async function onRequest(context) {
     }
 
     if (route === 'save' && request.method === 'POST') {
-      if (!env.GITHUB_TOKEN) return json({ error: 'GITHUB_TOKEN 환경변수가 설정되지 않았습니다.' }, 500);
+      if (!getEnv(env, 'GITHUB_TOKEN')) return json({ error: 'GITHUB_TOKEN 환경변수가 설정되지 않았습니다.' }, 500);
       const payload = await request.json();
       const name = payload && payload.name;
       if (!CONTENT_FILES[name]) return json({ error: '알 수 없는 항목입니다.' }, 400);
