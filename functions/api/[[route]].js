@@ -174,10 +174,12 @@ function sanitizeContent(name, data) {
     };
   }
   if (name === 'bulletins') {
+    // 주보 한 부에 앞면·뒷면처럼 여러 장이 들어갈 수 있다. image는 첫 장(예전 형식 호환용).
     return {
-      items: items.slice(0, 2000).map((b) => ({
-        date: str(b.date, 20), title: str(b.title, 120), image: safeImagePath(b.image),
-      })),
+      items: items.slice(0, 2000).map((b) => {
+        const images = (Array.isArray(b.images) ? b.images : [b.image]).map(safeImagePath).filter(Boolean).slice(0, 20);
+        return { date: str(b.date, 20), title: str(b.title, 120), image: images[0] || '', images };
+      }),
     };
   }
   if (name === 'gallery') {

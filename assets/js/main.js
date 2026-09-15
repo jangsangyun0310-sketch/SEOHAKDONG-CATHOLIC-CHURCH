@@ -203,22 +203,25 @@ document.addEventListener("DOMContentLoaded", () => {
           const lightboxImg = document.getElementById("lightboxImg");
           const lightboxCap = document.getElementById("lightboxCap");
           if (!lightbox || !lightboxImg || !lightboxCap) return;
+          // 주보는 앞면·뒷면 등 여러 장일 수 있어, 잘리지 않게 원래 비율로 위아래로 이어 붙여 보여준다
+          const images = Array.isArray(item.images) && item.images.length ? item.images : (item.image ? [item.image] : []);
           lightboxImg.innerHTML = "";
           lightboxImg.classList.remove("placeholder-photo");
-          if (item.image) {
-            const img = document.createElement("img");
-            img.src = item.image;
-            img.alt = `${item.date || ""} 주보`;
-            img.style.width = "100%";
-            img.style.height = "100%";
-            img.style.objectFit = "cover";
-            img.style.display = "block";
-            lightboxImg.appendChild(img);
+          lightboxImg.classList.toggle("lightbox-img--pages", images.length > 0);
+          if (images.length) {
+            images.forEach((src, i) => {
+              const img = document.createElement("img");
+              img.src = src;
+              img.alt = `${item.date || ""} 주보 ${i + 1}면`;
+              img.className = "lightbox-page";
+              img.loading = "lazy";
+              lightboxImg.appendChild(img);
+            });
           } else {
             lightboxImg.classList.add("placeholder-photo");
             lightboxImg.textContent = "사진 준비중";
           }
-          lightboxCap.textContent = `${item.date || ""} · ${item.title || ""}`;
+          lightboxCap.textContent = `${item.date || ""} · ${item.title || ""}` + (images.length > 1 ? ` (${images.length}면, 아래로 넘겨 보세요)` : "");
           lightbox.classList.add("open");
         }
 
@@ -238,6 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
     root.querySelectorAll(".gallery-item").forEach((btn) => {
       btn.addEventListener("click", () => {
         const imgUrl = btn.dataset.img;
+        lightboxImg.classList.remove("lightbox-img--pages");
         if (imgUrl) {
           lightboxImg.innerHTML = "";
           lightboxImg.classList.remove("placeholder-photo");

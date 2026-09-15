@@ -319,12 +319,15 @@
 
   // 사진 선택 상자 UI. 선택하면 바로 줄여서 미리보기까지 보여준다.
   function fileBox({ multiple, current, maxSide, quality, allowRemove }) {
+    // current는 경로 하나 또는 경로 배열(주보 여러 면)
+    const currentList = Array.isArray(current) ? current.filter(Boolean) : (current ? [current] : []);
+    current = currentList[0] || '';
     const box = document.createElement('div');
     box.className = 'file-box';
     box.innerHTML = `
       <label class="btn btn--outline btn--sm"><input type="file" accept="image/*" ${multiple ? 'multiple' : ''}>📷 ${current ? '사진 바꾸기' : '사진 고르기'}</label>
       ${allowRemove && current ? '<button type="button" class="btn btn--danger btn--sm" style="margin-left:8px;">사진 지우기</button>' : ''}
-      <p class="hint">${multiple ? '여러 장을 한 번에 골라도 됩니다.' : '휴대폰 사진첩이나 컴퓨터에서 고르세요.'}</p>
+      <p class="hint">${multiple ? '여러 장을 한 번에 골라도 됩니다. (휴대폰은 사진을 길게 눌러 여러 장 선택, PC는 Ctrl 누르고 클릭)' : '휴대폰 사진첩이나 컴퓨터에서 고르세요.'}</p>
       <div class="preview"></div>
     `;
     const input = box.querySelector('input');
@@ -335,7 +338,7 @@
       if (state.pending.length) {
         state.pending.forEach((p) => { const im = document.createElement('img'); im.src = p.previewUrl; preview.appendChild(im); });
       } else if (state.current && !state.removed) {
-        const im = document.createElement('img'); im.src = '../' + state.current; preview.appendChild(im);
+        currentList.forEach((p) => { const im = document.createElement('img'); im.src = '../' + p; preview.appendChild(im); });
       }
     }
     renderPreview();
@@ -435,7 +438,7 @@
         ${section !== 'notices' ? (it.image ? `<img class="thumb" src="../${esc(it.image)}" alt="">` : '<div class="thumb"></div>') : ''}
         <div class="main">
           <div class="title">${esc(it.title || '(제목 없음)')}</div>
-          <div class="meta">${esc(it.date || '')}${section === 'notices' && it.tag ? ' · ' + esc(it.tag) : ''}</div>
+          <div class="meta">${esc(it.date || '')}${section === 'notices' && it.tag ? ' · ' + esc(it.tag) : ''}${section === 'bulletins' && it.images && it.images.length > 1 ? ' · ' + it.images.length + '장' : ''}</div>
         </div>
         <div class="acts">
           <button type="button" class="btn btn--outline btn--sm" data-edit="${i}">수정</button>
@@ -470,7 +473,7 @@
       html = `
         ${dateField('주보 날짜 (주일)', item.date)}
         <label class="f">제목 <small>예: 연중 제23주일</small></label><input type="text" data-k="title" value="${esc(item.title || '')}" maxlength="120">
-        <label class="f">주보 사진</label><div data-file></div>`;
+        <label class="f">주보 사진 <small>앞면·뒷면 등 여러 장 가능. 새로 고르면 기존 사진은 전부 바뀝니다</small></label><div data-file></div>`;
     } else if (section === 'gallery') {
       html = `
         ${dateField('사진 날짜', item.date)}
@@ -486,9 +489,12 @@
     const fileSlot = form.querySelector('[data-file]');
     if (fileSlot) {
       const opts = section === 'bulletins'
-        ? { maxSide: 2000, quality: 0.85, multiple: false }
+        ? { maxSide: 2000, quality: 0.85, multiple: true }
         : { maxSide: 1600, quality: 0.82, multiple: isNew };
-      fb = fileBox({ ...opts, current: item.image || '', allowRemove: false });
+      const currentImages = section === 'bulletins'
+        ? (item.images && item.images.length ? item.images : (item.image ? [item.image] : []))
+        : (item.image || '');
+      fb = fileBox({ ...opts, current: currentImages, allowRemove: false });
       fileSlot.replaceWith(fb.el);
     }
     const val = (k) => { const el = form.querySelector(`[data-k="${k}"]`); return el ? el.value.trim() : ''; };
@@ -517,7 +523,8 @@
           const n = { tag: val('tag'), title, date, body: val('body') };
           if (isNew) items.unshift(n); else items[index] = n;
         } else if (section === 'bulletins') {
-          const b = { date, title, image: uploaded[0] || item.image || '' };
+          const images = uploaded.length ? uploaded : (item.images && item.images.length ? item.images : (item.image ? [item.image] : []));
+          const b = { date, title, image: images[0] || '', images };
           if (isNew) items.unshift(b); else items[index] = b;
         } else if (section === 'gallery') {
           if (isNew) {

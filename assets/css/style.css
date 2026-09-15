@@ -2549,3 +2549,16 @@ tr:last-child td { border-bottom: none; }
 @media (max-width: 640px) {
   .admin-fab { right: 12px; bottom: 68px; padding: 10px 14px; font-size: 13px; }
 }
+
+/* 주보 보기 — 여러 면을 원래 비율로 위아래로 이어서, 스크롤해 넘겨 본다 */
+.lightbox-inner { max-height: 92vh; display: flex; flex-direction: column; }
+.lightbox-inner .lightbox-cap { flex-shrink: 0; }
+.lightbox-img--pages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #e9e4dc;
+}
+.lightbox-page { display: block; width: 100%; height: auto; }
+.lightbox-page + .lightbox-page { margin-top: 6px; }
