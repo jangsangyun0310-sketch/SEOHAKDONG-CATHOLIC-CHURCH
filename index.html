@@ -462,8 +462,15 @@
     const modal = document.getElementById('installModal');
     if (!installBtn || !modal) return;
 
-    const alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const standaloneQuery = window.matchMedia('(display-mode: standalone)');
+    const alreadyInstalled = standaloneQuery.matches || window.navigator.standalone === true;
     if (alreadyInstalled) { installBtn.remove(); return; }
+    // PC 크롬은 "설치"를 누르면 새로고침 없이 그 탭을 앱 창으로 바꿔버리므로,
+    // 설치가 끝난 순간(또는 앱 창으로 바뀐 순간)에도 버튼을 바로 없앤다
+    window.addEventListener('appinstalled', () => installBtn.remove());
+    if (standaloneQuery.addEventListener) {
+      standaloneQuery.addEventListener('change', (e) => { if (e.matches) installBtn.remove(); });
+    }
 
     function openModal() { modal.classList.add('open'); }
     function closeModal() { modal.classList.remove('open'); }
