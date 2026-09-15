@@ -343,17 +343,6 @@ export async function onRequest(context) {
 
   if (request.method === 'OPTIONS') return new Response(null, { status: 204 });
 
-  // 설정 점검용(로그인 불필요): 비밀값 자체는 절대 내보내지 않고 "있는지 없는지"만 알려준다
-  if (route === 'health' && request.method === 'GET') {
-    return json({
-      github_token: !!env.GITHUB_TOKEN,
-      firebase_service_account: !!env.FIREBASE_SERVICE_ACCOUNT,
-      repo: cfg(env, 'GITHUB_REPO'),
-      branch: cfg(env, 'GITHUB_BRANCH'),
-      env_keys: Object.keys(env || {}).map((k) => '[' + k + ']' + ''),
-    });
-  }
-
   try {
     const auth = await requireAdmin(request, env);
     if (auth.error) return auth.error;
