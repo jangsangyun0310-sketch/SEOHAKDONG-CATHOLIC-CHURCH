@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>관리자 버튼 점검</title>
+<style>
+  body { font-family: "Malgun Gothic", sans-serif; font-size: 18px; padding: 24px; line-height: 1.7; color: #17222d; }
+  li { margin-bottom: 8px; }
+  .ok { color: #0e6b63; font-weight: 700; }
+  .bad { color: #b3413a; font-weight: 700; }
+</style>
+</head>
+<body>
+<h2>관리자 버튼 점검</h2>
+<ol id="log"></ol>
+<p><a href="../">홈페이지로</a> · <a href="./">관리자 페이지로</a></p>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="../assets/js/push-config.js?v=202609150"></script>
+<script>
+  const log = (msg, cls) => { const li = document.createElement('li'); li.textContent = msg; if (cls) li.className = cls; document.getElementById('log').appendChild(li); };
+  window.addEventListener('error', (e) => log('스크립트 오류: ' + e.message, 'bad'));
+  try {
+    log('브라우저: ' + navigator.userAgent.replace(/^.*\) /, ''));
+    log('Firebase SDK 로드: ' + (window.firebase ? '됨' : '안 됨'), window.firebase ? 'ok' : 'bad');
+    log('auth 모듈: ' + (firebase.auth ? '있음' : '없음'), firebase.auth ? 'ok' : 'bad');
+    log('대표 관리자 설정값: ' + (window.SITE_OWNER_EMAIL || '(없음)'));
+    if (!firebase.apps.length) firebase.initializeApp(window.FIREBASE_CONFIG);
+    firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) { log('로그인 상태: 로그인 안 됨 (이 브라우저에는 로그인 정보가 없음)', 'bad'); return; }
+      log('로그인 상태: ' + user.email + ' (' + (user.displayName || '') + ')', 'ok');
+      const owner = String(window.SITE_OWNER_EMAIL || '').toLowerCase();
+      const isOwner = user.email.toLowerCase() === owner;
+      log('대표 관리자 여부: ' + (isOwner ? '예' : '아니오'), isOwner ? 'ok' : '');
+      try {
+        const doc = await firebase.firestore().collection('admins').doc(user.email.toLowerCase()).get();
+        log('admins 명단 확인: ' + (doc.exists ? '등록됨' : '없음'), doc.exists ? 'ok' : '');
+      } catch (e) {
+        log('admins 명단 확인 오류: ' + (e.code || e.message), 'bad');
+      }
+      log('결론: 홈페이지에 관리 버튼이 ' + (isOwner ? '보여야 함' : '(명단 확인 결과에 따름)'), 'ok');
+    });
+  } catch (e) { log('오류: ' + e.message, 'bad'); }
+</script>
+</body>
+</html>
