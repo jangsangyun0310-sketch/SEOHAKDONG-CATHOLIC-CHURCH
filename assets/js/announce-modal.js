@@ -1,10 +1,12 @@
 // 접속 시 뜨는 공지·행사 안내 팝업.
 // 제목/본문/사진/켜고끄기는 content/announce.json에서 불러옵니다 (관리자 페이지에서 편집).
-document.addEventListener('DOMContentLoaded', () => {
+// 이 팝업을 띄울지 결정이 끝나는 시점을 window.__announceReady로 알려서,
+// 다른 팝업(알림 수신 동의 등)이 겹쳐 뜨지 않게 한다.
+window.__announceReady = (function () {
   const modal = document.getElementById('announceModal');
-  if (!modal) return;
+  if (!modal) return Promise.resolve();
 
-  fetch('content/announce.json')
+  return fetch('content/announce.json')
     .then((res) => res.json())
     .then((data) => {
       if (!data || !data.active) return;
@@ -39,4 +41,4 @@ document.addEventListener('DOMContentLoaded', () => {
       if (localStorage.getItem(HIDE_KEY) !== todayStr) openModal();
     })
     .catch(() => {});
-});
+})();

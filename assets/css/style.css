@@ -1494,38 +1494,34 @@ tr:last-child td { border-bottom: none; }
 
 .announce-modal-hide input { width: 16px; height: 16px; cursor: pointer; }
 
-/* ---------- 알림 받기(웹 푸시) ---------- */
-.push-fab {
-  position: fixed;
-  right: 16px;
-  bottom: 20px;
-  z-index: 150;
-  display: flex;
+/* ---------- 알림 받기(웹 푸시) — 알림함 안의 켜기/끄기 버튼 ---------- */
+.push-toggle-row { border-bottom: 1px solid var(--color-line); padding-bottom: 16px; margin-bottom: 4px; }
+
+.push-toggle-btn {
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 12px 18px;
+  width: 100%;
+  padding: 12px 20px;
   border: none;
   border-radius: 999px;
   background: var(--color-wine);
   color: #fff;
   font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 14.5px;
+  font-weight: 700;
+  line-height: 1;
   cursor: pointer;
-  box-shadow: var(--shadow-soft);
-  transition: opacity .18s ease, transform .18s ease, background .18s ease;
+  transition: background .2s ease;
 }
 
-.push-fab:hover { background: var(--color-wine-dark); }
-.push-fab svg { width: 17px; height: 17px; flex-shrink: 0; }
+.push-toggle-btn:hover { background: var(--color-wine-dark); }
+.push-toggle-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+.push-toggle-btn.is-subscribed { background: var(--color-ivory-deep); color: var(--color-ink); border: 1px solid var(--color-line); }
 
-.push-fab.is-subscribed { background: var(--color-ink); }
-.push-fab.is-subscribed:hover { background: var(--color-ink); opacity: .9; }
-
-@media (max-width: 640px) {
-  .push-fab { right: 12px; bottom: 16px; padding: 11px 16px; font-size: 13px; }
-  .push-fab svg { width: 15px; height: 15px; }
-}
+.push-optin-actions { display: flex; gap: 10px; margin-top: 4px; }
+.push-optin-actions .btn { flex: 1; justify-content: center; }
 
 /* ---------- 알림함 ---------- */
 .notif-bell {

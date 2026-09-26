@@ -163,4 +163,43 @@
     if (subscribedNow()) unsubscribe();
     else subscribe();
   });
+
+  // Android에서 "홈 화면에 추가"를 수락한 직후 같은 탭(사용자 제스처) 안에서
+  // 알림 허용까지 바로 물어보기 위해 설치 로직에서 호출할 수 있도록 노출해둔다
+  window.__pushSubscribe = subscribe;
+
+  // 앱을 설치 후 처음 standalone으로 열었을 때 한 번만 자동으로 알림 수신을 물어봄
+  // (아이폰은 홈 화면 설치 전엔 알림 요청 자체가 불가능해서, 설치 다음 실행 시점에 물어보는 게 유일한 방법)
+  const OPT_IN_ASKED_KEY = 'seohakdong-push-optin-asked';
+  const optInModal = document.getElementById('pushOptInModal');
+  if (!optInModal) return;
+  const closeOptIn = () => optInModal.classList.remove('open');
+  document.getElementById('pushOptInYes').addEventListener('click', () => { closeOptIn(); subscribe(); });
+  document.getElementById('pushOptInNo').addEventListener('click', closeOptIn);
+  document.getElementById('pushOptInClose').addEventListener('click', closeOptIn);
+  optInModal.addEventListener('click', (e) => { if (e.target === optInModal) closeOptIn(); });
+
+  function maybeOfferPushOptIn() {
+    if (isInApp || !isStandalone) return;
+    if (subscribedNow()) return;
+    if (Notification.permission === 'denied') return;
+    if (localStorage.getItem(OPT_IN_ASKED_KEY)) return;
+
+    function show() {
+      localStorage.setItem(OPT_IN_ASKED_KEY, '1');
+      optInModal.classList.add('open');
+    }
+    // 오늘의 공지 팝업이 이미 떠 있으면, 겹치지 않도록 그 팝업이 닫힌 뒤에 띄운다
+    const announceModal = document.getElementById('announceModal');
+    if (announceModal && announceModal.classList.contains('open')) {
+      const obs = new MutationObserver(() => {
+        if (!announceModal.classList.contains('open')) { obs.disconnect(); show(); }
+      });
+      obs.observe(announceModal, { attributes: true, attributeFilter: ['class'] });
+    } else {
+      show();
+    }
+  }
+  // 공지 팝업을 띄울지 결정(content/announce.json 로딩)이 끝난 뒤에 판단해야 겹치지 않는다
+  (window.__announceReady || Promise.resolve()).then(maybeOfferPushOptIn);
 })();
