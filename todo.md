@@ -92,8 +92,8 @@
 
 ## 앞으로 작업이 필요할 수 있는 부분 (제안 — 명시적 지시는 없었음, 확인 후 진행)
 
-- [ ] **사용자 직접: GitHub 토큰(`GITHUB_TOKEN`) 만들어 Worker 비밀값에 넣기** — 없으면 관리자 페이지에서 사진 저장 불가 (글은 됨). `docs/관리자-설정-안내.md` A항목
-- [ ] **사용자 직접: Workers 자동 배포 연결** (대시보드 Settings → Build → Connect) — 안 하면 코드·사진 커밋이 자동 배포되지 않음 (사진은 GitHub에서 직접 읽어 보이긴 함). B항목
+- [x] GitHub 토큰(`GITHUB_TOKEN`, 이 저장소 Contents 읽기/쓰기만) 만들어 Worker 비밀값에 넣기 — 2026-09-26 사용자와 함께 완료
+- [x] Workers 자동 배포 연결 (Settings → Build → Connect, main 브랜치, Deploy command `npx wrangler deploy`) — 2026-09-26 완료. D1 표 구조 변경(migrations)은 자동 배포에 포함되지 않으므로 `npm run db:migrate:remote`로 따로 적용
 - [ ] **사용자 직접: 카카오맵에 새 도메인 등록** — 안 하면 지도 대신 "카카오맵에서 열기" 버튼. C항목
 - [ ] 예전 Cloudflare Pages 프로젝트(`seohakdong-catholic-church.pages.dev`) 삭제 여부 결정 — 이번 구조 변경 뒤로는 예전 주소가 제대로 안 뜸. 삭제 시 그 안의 예전 GitHub 토큰(classic, repo 전체 권한)도 GitHub에서 폐기 권장
 - [ ] 쓰지 않게 된 것 정리 여부: GitHub Actions 비밀값 `FIREBASE_SERVICE_ACCOUNT`, Firebase의 Firestore 데이터(모두 D1로 옮김)
