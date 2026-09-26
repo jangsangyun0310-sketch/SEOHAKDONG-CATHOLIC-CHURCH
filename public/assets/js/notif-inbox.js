@@ -1,5 +1,6 @@
 // 알림함 — 성당에서 보낸 알림을 홈페이지 안에도 목록으로 남겨서,
 // 푸시 알림을 못 받는 분(아이폰 등)도 볼 수 있고, 각자 필요 없는 건 지울 수 있게 한다.
+// 목록은 서버(D1)에서 받아오며, 알림함을 열 때·화면으로 돌아올 때·새 알림이 올 때 다시 받아온다.
 (function () {
   const I18N = window.I18N || { lang: 'ko', locale: 'ko-KR', t: (key, ko) => ko };
   const bellBtns = document.querySelectorAll('.notif-bell');
@@ -7,9 +8,6 @@
   const listEl = document.getElementById('notifList');
   const emptyEl = document.getElementById('notifEmpty');
   if (!bellBtns.length || !panel || !listEl) return;
-
-  const supported = window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey !== 'REPLACE_ME';
-  if (!supported) { bellBtns.forEach((b) => b.remove()); return; }
 
   const DISMISSED_KEY = 'seohakdong-dismissed-notifs';
 
@@ -23,12 +21,9 @@
     localStorage.setItem(DISMISSED_KEY, JSON.stringify([...set]));
   }
 
-  function getFirebaseApp() {
-    return firebase.apps.length ? firebase.apps[0] : firebase.initializeApp(window.FIREBASE_CONFIG);
-  }
-
-  function formatDate(date) {
-    if (!date) return '';
+  function formatDate(iso) {
+    const date = iso ? new Date(iso) : null;
+    if (!date || Number.isNaN(date.getTime())) return '';
     return date.toLocaleString(I18N.locale, { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   }
 
@@ -44,7 +39,7 @@
       li.className = 'notif-item';
       const body = document.createElement('div');
       body.className = 'notif-item-body';
-      body.innerHTML = `<strong class="notif-item-title"></strong><p class="notif-item-text"></p><span class="notif-item-date"></span>`;
+      body.innerHTML = '<strong class="notif-item-title"></strong><p class="notif-item-text"></p><span class="notif-item-date"></span>';
       body.querySelector('.notif-item-title').textContent = it.title;
       body.querySelector('.notif-item-text').textContent = it.body;
       body.querySelector('.notif-item-date').textContent = formatDate(it.createdAt);
@@ -68,7 +63,8 @@
       li.appendChild(body);
       li.appendChild(delBtn);
       listEl.appendChild(li);
-    });  }
+    });
+  }
 
   // 배지 숫자 = 지우지 않고 알림함에 남아있는 알림 개수 (읽었는지 여부와 무관)
   function updateBadge() {
@@ -89,31 +85,26 @@
     }
   }
 
-  // 새로고침 안 하고 홈페이지를 보고 있는 중에도 새 알림이 오면 바로 배지에 반영되도록,
-  // 한 번만 읽어오는 get() 대신 실시간으로 계속 지켜보는 onSnapshot()을 쓴다
-  function watchAnnouncements() {
-    getFirebaseApp();
-    firebase.firestore().collection('announcements')
-      .orderBy('createdAt', 'desc')
-      .limit(30)
-      .onSnapshot((snap) => {
-        items = snap.docs.map((doc) => {
-          const d = doc.data();
-          return {
-            id: doc.id,
-            title: d.title || '서학동성당',
-            body: d.body || '',
-            createdAt: d.createdAt && d.createdAt.toDate ? d.createdAt.toDate() : null
-          };
-        });
+  let loading = null;
+  function load() {
+    if (loading) return loading;
+    loading = fetch('/api/announcements', { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        items = data.items || [];
         updateBadge();
         if (panel.classList.contains('open')) renderList();
-      }, (err) => console.error('알림함 실시간 감지 실패', err));
+      })
+      .catch((err) => console.error('알림함 불러오기 실패', err))
+      .finally(() => { loading = null; });
+    return loading;
   }
 
   function openPanel() {
     renderList();
     panel.classList.add('open');
+    load();
   }
   function closePanel() { panel.classList.remove('open'); }
 
@@ -122,5 +113,9 @@
   if (closeBtn) closeBtn.addEventListener('click', closePanel);
   panel.addEventListener('click', (e) => { if (e.target === panel) closePanel(); });
 
-  watchAnnouncements();
+  // 다른 앱을 보다가 돌아왔을 때, 그리고 화면을 보는 중에 새 알림(푸시)이 왔을 때 다시 받아온다
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') load(); });
+  window.addEventListener('seohakdong:notification', load);
+
+  load();
 })();

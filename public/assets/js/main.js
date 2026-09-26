@@ -94,18 +94,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   bindNoticeAccordions(document);
 
-  // 공지사항 목록 — content/notices.json에서 불러와 채움 (관리자 페이지에서 편집)
+  // 공지·주보·갤러리 목록은 서버(D1)에서 site-data.js가 한 번에 받아온 것을 쓴다 (관리자 페이지에서 편집)
+  const siteData = window.SITE_DATA || Promise.resolve(null);
   function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, (c) => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
     }[c]));
   }
+
+  // 공지사항 목록
   const noticeList = document.getElementById("noticeList");
   if (noticeList) {
-    fetch("content/notices.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const items = (data && data.items) || [];
+    siteData
+      .then((site) => {
+        const items = (site && site.notices) || [];
         noticeList.innerHTML = items.map((n) => `
           <div class="notice-item">
             <button class="notice-row">
@@ -124,17 +126,16 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(() => {});
   }
 
-  // 주보 아카이브 — content/bulletins.json에서 불러와 채움 (관리자 페이지에서 편집)
+  // 주보 아카이브
   (function () {
     const latestEl = document.getElementById("bulletinLatest");
     const yearTabsEl = document.getElementById("bulletinYearTabs");
     const weekListEl = document.getElementById("bulletinWeekList");
     if (!latestEl || !yearTabsEl || !weekListEl) return;
 
-    fetch("content/bulletins.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const items = (data && data.items) || [];
+    siteData
+      .then((site) => {
+        const items = (site && site.bulletins) || [];
         if (!items.length) {
           latestEl.innerHTML = `
             <div><p class="eyebrow" style="margin-bottom:6px;">${escapeHtml(t("bulletin_latest", "최근 게시된 주보"))}</p><h3 style="margin:0;">${escapeHtml(t("bulletin_preparing_title", "주보 자료 준비중"))}</h3></div>
@@ -277,14 +278,22 @@ document.addEventListener("DOMContentLoaded", () => {
     viewer.index = (viewer.index + delta + total) % total;
     renderViewer();
   }
-  function openAlbum(album, startIndex) {
+  // 앨범 사진 목록은 앨범을 열 때 서버에서 받아온다 (사진이 수천 장이 되어도 첫 화면이 무거워지지 않게)
+  async function openAlbum(album) {
     if (!lightbox || !lightboxImg || !lightboxCap) return;
-    viewer.photos = album.photos.filter((p) => p.image);
-    if (!viewer.photos.length) return;
-    viewer.index = Math.max(0, Math.min(startIndex || 0, viewer.photos.length - 1));
+    let paths = [];
+    try {
+      const res = await fetch(`/api/gallery/${album.id}`, { cache: "no-store" });
+      if (res.ok) paths = (await res.json()).album.photos || [];
+    } catch (e) { /* 못 받아오면 대표 사진만 보여준다 */ }
+    if (!paths.length && album.cover) paths = [album.cover];
+    if (!paths.length) return;
+    viewer.photos = paths.map((image) => ({ image, title: album.titleMain }));
+    viewer.index = 0;
     viewer.caption = `${album.date || ""} · ${album.titleMain || ""}`;
     renderViewer();
-    lightbox.classList.add("open");  }
+    lightbox.classList.add("open");
+  }
   if (lightbox && lightboxImg && lightboxCap) {
     const closeBtn = document.getElementById("lightboxClose");
     if (closeBtn) closeBtn.addEventListener("click", () => lightbox.classList.remove("open"));
@@ -308,18 +317,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }, { passive: true });
   }
 
-  // 갤러리 — content/gallery.json에서 불러와 채움 (관리자 페이지에서 편집)
-  // 같은 날짜·같은 제목의 사진들은 하나의 "앨범"으로 묶어, 대표 사진 한 장과 장수(+N)만 보여준다.
+  // 갤러리 — 앨범마다 대표 사진 한 장과 장수(+N)만 보여주고, 누르면 앨범 사진을 한 장씩 본다
   (function () {
     const grid = document.getElementById("galleryGrid");
     const yearTabsEl = document.getElementById("galleryYearTabs");
     const pagination = document.querySelector(".gallery-pagination");
     if (!grid || !yearTabsEl || !pagination) return;
 
-    fetch("content/gallery.json")
-      .then((res) => res.json())
-      .then((data) => {
-        const items = (data && data.items) || [];
+    siteData
+      .then((site) => {
         const PAGE_SIZE = 8;
         const DECADES = [2020, 2010, 2000, 1990, 1980, 1970, 1960];
 
@@ -328,23 +334,15 @@ document.addEventListener("DOMContentLoaded", () => {
           return Number.isNaN(y) ? null : Math.floor(y / 10) * 10;
         }
 
-        // 앨범 묶기
-        const albumMap = new Map();
-        items.forEach((item) => {
-          const key = `${item.date || ""}|${item.title || ""}`;
-          if (!albumMap.has(key)) {
-            const parenMatch = String(item.title || "").match(/^(.*?)\s*\(([^)]+)\)\s*$/);
-            albumMap.set(key, {
-              date: item.date || "",
-              title: item.title || "",
-              titleMain: parenMatch ? parenMatch[1] : item.title || "",
-              titleExtra: parenMatch ? parenMatch[2] : "",
-              photos: [],
-            });
-          }
-          albumMap.get(key).photos.push(item);
+        // 제목 끝의 괄호 부분은 작게 따로 보여준다 (예: "본당의 날 (2부)")
+        const albums = ((site && site.gallery) || []).map((a) => {
+          const parenMatch = String(a.title || "").match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+          return {
+            ...a,
+            titleMain: parenMatch ? parenMatch[1] : a.title || "",
+            titleExtra: parenMatch ? parenMatch[2] : "",
+          };
         });
-        const albums = [...albumMap.values()].sort((a, b) => String(b.date).localeCompare(String(a.date)));
 
         const decadesAvailable = new Set(albums.map((a) => decadeOf(a.date)));
         let currentDecade = DECADES.find((d) => decadesAvailable.has(d));
@@ -385,8 +383,7 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           const start = (currentPage - 1) * PAGE_SIZE;
           filtered.slice(start, start + PAGE_SIZE).forEach((album) => {
-            const cover = album.photos.find((p) => p.image);
-            const count = album.photos.filter((p) => p.image).length;
+            const count = Number(album.count) || 0;
             const titleExtra = album.titleExtra
               ? `<span class="gallery-cap-extra">(${escapeHtml(album.titleExtra)})</span>`
               : "";
@@ -395,14 +392,15 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.className = "gallery-item";
             btn.innerHTML = `
               <div class="gallery-thumb placeholder-photo placeholder-photo--photo">
-                ${cover ? `<img src="${cover.image}" alt="${escapeHtml(album.titleMain)}" loading="lazy">` : ""}
+                ${album.cover ? `<img src="${escapeHtml(album.cover)}" alt="${escapeHtml(album.titleMain)}" loading="lazy">` : ""}
                 ${count > 1 ? `<span class="gallery-count">+${count - 1}</span>` : ""}
               </div>
               <div class="gallery-cap"><span class="gallery-cap-date">${escapeHtml(album.date)}</span><span class="gallery-cap-title">${escapeHtml(album.titleMain)}</span>${titleExtra}</div>
             `;
-            btn.addEventListener("click", () => openAlbum(album, 0));
+            btn.addEventListener("click", () => openAlbum(album));
             grid.appendChild(btn);
-          });          renderPagination(totalPages);
+          });
+          renderPagination(totalPages);
         }
 
         function renderPagination(totalPages) {

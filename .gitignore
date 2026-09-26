@@ -1,2 +1,6 @@
 node_modules/
+.wrangler/
+.dev.vars
 scripts/serviceAccountKey.json
+serviceAccountKey.json
+test-results/

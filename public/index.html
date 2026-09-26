@@ -10,8 +10,8 @@
 <meta property="og:site_name" content="서학동성당">
 <meta property="og:title" content="전주 서학동성당 | 천주교 전주교구">
 <meta property="og:description" content="1968년 설립, 예수·마리아·요셉의 성가정을 주보로 모시는 천주교 전주교구 서학동성당 공식 홈페이지입니다. 한옥마을에서 가까운 신앙공동체.">
-<meta property="og:url" content="https://seohakdong-catholic-church.pages.dev/">
-<meta property="og:image" content="https://seohakdong-catholic-church.pages.dev/assets/img/og-logo.png">
+<meta property="og:url" content="https://seohakdong-catholic-church.jangsangyun0310.workers.dev/">
+<meta property="og:image" content="https://seohakdong-catholic-church.jangsangyun0310.workers.dev/assets/img/og-logo.png">
 <meta property="og:image:width" content="1254">
 <meta property="og:image:height" content="1254">
 
@@ -119,7 +119,7 @@
     </div>
   </div>
 
-  <!-- 아래 날짜/전례색/말씀은 매일 자동으로 Firestore(site_data/todayword)에서 불러와 채워집니다 (assets/js/todayword.js).
+  <!-- 아래 날짜/전례색/말씀은 매일 자동으로 서버(D1)에 저장되는 값을 불러와 채워집니다 (assets/js/todayword.js).
        아래 값들은 그 전에 잠깐 보이는 기본값이며, 자동 갱신 때문에 이 파일이 커밋되는 일은 없습니다. -->
   <div class="liturgy-strip">
     <div class="container liturgy-row">
@@ -284,10 +284,10 @@
       <p class="verse-sub" data-i18n-html="notice_verse">“기쁜 소식을 전하는 이들의 발이<br class="br-mobile"> 얼마나 아름다운가!”<br class="br-mobile"> <span class="verse-cite-inline">로마서 10장 15절</span></p>
     </div>
 
-    <!-- 아래 목록은 content/notices.json에서 자동으로 채워집니다. admin/ 관리자 페이지에서 편집하세요. -->
+    <!-- 아래 목록은 서버(D1)의 공지사항으로 자동으로 채워집니다. admin/ 관리자 페이지에서 편집하세요. -->
     <div class="notice-list" id="noticeList"></div>
 
-    <!-- 아래 내용은 content/bulletins.json에서 자동으로 채워집니다. admin/ 관리자 페이지에서 편집하세요. -->
+    <!-- 아래 내용은 서버(D1)의 주보 목록으로 자동으로 채워집니다. admin/ 관리자 페이지에서 편집하세요. -->
     <div id="bulletin" style="margin-top:44px; padding-top:36px; border-top:1px solid var(--color-line);">
       <div class="bulletin-latest" id="bulletinLatest"></div>
       <div class="bulletin-year-tabs" id="bulletinYearTabs"></div>
@@ -304,7 +304,7 @@
       <p class="verse-sub" data-i18n-html="gallery_verse">“보라, 형제들이 함께 어울려 사는 것이<br class="br-mobile"> 얼마나 좋고 얼마나 아름다운가!”<br class="br-mobile"> <span class="verse-cite-inline">시편 133장 1절</span></p>
     </div>
 
-    <!-- 아래 내용은 content/gallery.json에서 자동으로 채워집니다. admin/ 관리자 페이지에서 편집하세요. -->
+    <!-- 아래 내용은 서버(D1)의 갤러리 앨범으로 자동으로 채워집니다. admin/ 관리자 페이지에서 편집하세요. -->
     <div class="gallery-year-tabs" id="galleryYearTabs"></div>
     <div class="gallery-grid" id="galleryGrid"></div>
 
@@ -514,20 +514,21 @@
   </div>
 </div>
 
+<!-- 공지·주보·갤러리·팝업·오늘의 말씀을 서버(D1)에서 한 번에 받아온다 — 다른 스크립트보다 먼저 -->
+<script src="assets/js/site-data.js?v=202609270"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="assets/js/push-config.js?v=202609150"></script>
+<script src="assets/js/push-config.js?v=202609270"></script>
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=cbcb370204a8f8c4a89fb47c6e001a5f&libraries=services&autoload=false"></script>
 <script src="assets/js/i18n.js?v=202609265"></script>
-<script src="assets/js/todayword.js?v=202609265"></script>
-<script src="assets/js/main.js?v=202609265"></script>
-<script src="assets/js/announce-modal.js?v=202609265"></script>
-<script src="assets/js/push.js?v=202609265"></script>
-<script src="assets/js/notif-inbox.js?v=202609265"></script>
+<script src="assets/js/todayword.js?v=202609270"></script>
+<script src="assets/js/main.js?v=202609270"></script>
+<script src="assets/js/announce-modal.js?v=202609270"></script>
+<script src="assets/js/push.js?v=202609270"></script>
+<script src="assets/js/notif-inbox.js?v=202609270"></script>
 <!-- 구글 로그인한 관리자에게만 "관리" 버튼을 보여준다 (admin/ 관리자 페이지로 연결) -->
-<script src="assets/js/admin-link.js?v=202609150"></script>
+<script src="assets/js/admin-link.js?v=202609270"></script>
 <script>
   // "홈 화면에 추가" — 신자분들이 앱처럼 바로 들어올 수 있도록 안내
   (function () {

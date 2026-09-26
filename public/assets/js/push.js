@@ -9,13 +9,16 @@
   const STORAGE_KEY = 'seohakdong-push-subscribed';
   const TOKEN_STORAGE_KEY = 'seohakdong-push-token';
 
-  // 토큰을 새로 받을 때마다 이전 토큰의 Firestore 기록을 같이 지워서,
+  function postJson(path, body) {
+    return fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then((res) => { if (!res.ok) throw new Error(`${path} ${res.status}`); });
+  }
+
+  // 서버(D1)에 구독 토큰을 저장한다. 토큰이 새로 발급됐으면 이전 토큰도 같이 알려 지우게 해서,
   // 이미 무효해진 옛날 토큰이 계속 쌓여있다가 발송할 때마다 실패로 잡히는 일을 막는다
-  async function replaceStoredToken(db, newToken) {
-    const previousToken = localStorage.getItem(TOKEN_STORAGE_KEY);
-    if (previousToken && previousToken !== newToken) {
-      await db.collection('push_tokens').doc(previousToken).delete().catch(() => {});
-    }
+  async function saveToken(newToken) {
+    const previous = localStorage.getItem(TOKEN_STORAGE_KEY) || '';
+    await postJson('/api/push/subscribe', { token: newToken, previous });
     localStorage.setItem(TOKEN_STORAGE_KEY, newToken);
   }
 
@@ -74,6 +77,7 @@
         if (reg) reg.showNotification(title, { body, icon: 'assets/img/icons/icon-192.png', tag: id, data: { id } });
       });
       setLabel(`🔔 ${title}`, true);
+      window.dispatchEvent(new Event('seohakdong:notification'));
     });
   }
 
@@ -89,14 +93,7 @@
         // 먼저 지워서 매번 진짜 새 토큰을 강제로 발급받는다
         await messaging.deleteToken().catch(() => {});
         const token = await messaging.getToken({ vapidKey: window.FIREBASE_VAPID_KEY, serviceWorkerRegistration: reg });
-        if (token) {
-          const db = firebase.firestore();
-          await db.collection('push_tokens').doc(token).set({
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            ua: navigator.userAgent
-          });
-          await replaceStoredToken(db, token);
-        }
+        if (token) await saveToken(token);
       } catch (err) {
         console.error('토큰 갱신 실패', err);
       }
@@ -123,13 +120,7 @@
         serviceWorkerRegistration: reg
       });
       if (!token) throw new Error('토큰 발급 실패');
-
-      const db = firebase.firestore();
-      await db.collection('push_tokens').doc(token).set({
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        ua: navigator.userAgent
-      });
-      await replaceStoredToken(db, token);
+      await saveToken(token);
 
       localStorage.setItem(STORAGE_KEY, '1');
       setLabel(t('push_subscribed', '알림 받는 중 ✓'), true);
@@ -149,7 +140,7 @@
       const reg = await navigator.serviceWorker.getRegistration('service-worker.js');
       const token = await messaging.getToken({ vapidKey: window.FIREBASE_VAPID_KEY, serviceWorkerRegistration: reg }).catch(() => null);
       if (token) {
-        await firebase.firestore().collection('push_tokens').doc(token).delete().catch(() => {});
+        await postJson('/api/push/unsubscribe', { token }).catch(() => {});
         await messaging.deleteToken().catch(() => {});
       }
     } finally {
@@ -201,6 +192,6 @@
       show();
     }
   }
-  // 공지 팝업을 띄울지 결정(content/announce.json 로딩)이 끝난 뒤에 판단해야 겹치지 않는다
+  // 공지 팝업을 띄울지 결정(서버에서 팝업 내용 받기)이 끝난 뒤에 판단해야 겹치지 않는다
   (window.__announceReady || Promise.resolve()).then(maybeOfferPushOptIn);
 })();

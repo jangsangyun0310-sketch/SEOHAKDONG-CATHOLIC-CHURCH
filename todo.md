@@ -1,9 +1,24 @@
 # 서학동성당 홈페이지 작업 기록 (todo.md)
 
-> 마지막 정리: 2026-09-26 (알림 버튼 통일 반영)
-> git 커밋 로그(100개 커밋) 기준으로 정리한 내용입니다. 새로 작업할 때마다 이 파일을 업데이트해주세요.
+> 마지막 정리: 2026-09-26 (Cloudflare Workers + D1 전환 반영)
+> git 커밋 로그 기준으로 정리한 내용입니다. 새로 작업할 때마다 이 파일을 업데이트해주세요.
+> 새 주소: https://seohakdong-catholic-church.jangsangyun0310.workers.dev/ (구조·설정은 `docs/관리자-설정-안내.md`)
 
 ## 지금까지 완료한 작업
+
+### 0. Cloudflare Workers + D1 전환 — 2026-09-26
+- **배경(사용자 결정):** 네 프로젝트(용머리·서학동·해월피정의집·samudaejeon)를 운영 전에 한 방향으로 통일. 조건: 반영구적, 안정적, **결제수단 등록 없음**, 사진 1년 약 1,000장. 서학동성당을 먼저 옮겨 기준으로 삼고 같은 방식으로 용머리성당 → 해월·samudaejeon 순으로 맞춘다.
+- **선택 이유(공식 문서 확인):** D1은 무료 한도(하루 읽기 500만·쓰기 10만, 5GB) 초과 시 요금 대신 오류만 남. R2는 구독 결제 절차가 필요하고 초과 시 자동 청구라 제외. Firebase Storage는 결제 요금제 필요. D1에 사진은 DB당 500MB라 2~3년이면 차서 제외 → 사진은 GitHub 저장소 + 정보만 D1.
+- 사이트 파일을 `public/`으로 이동(서버 코드·비밀 파일이 공개되지 않게), 서버는 `src/worker.js`(+ `util.js`, `github.js`, `firebase.js`, `todayword.js`), 설정 `wrangler.jsonc`, 표 구조 `migrations/0001_initial.sql`
+- D1 표: notices, bulletins+bulletin_images, gallery_albums+gallery_photos, announce, announcements(알림함), push_tokens, admins, todayword
+- 공개 API: `GET /api/home`(공지·주보·앨범 요약·팝업·오늘의 말씀 한 번에), `GET /api/gallery/:id`(앨범 열 때 사진 목록), `GET /api/announcements`, `POST /api/push/subscribe|unsubscribe`, `POST /api/cron/todayword`(암호 필요)
+- 관리자 API `/api/admin/*`: 구글 로그인 토큰 확인 + D1 관리자 명단. 항목별 추가·수정·삭제(예전엔 JSON 파일 통째로 덮어쓰기). 사진은 올린 뒤 저장할 때 한 번의 커밋으로 추가·삭제(다른 곳에서 안 쓰는 사진만 삭제), 동시 저장 시 커밋 재시도, 올리지 않은 업로드 경로 참조는 거부
+- 방금 올려 아직 배포 전인 사진은 Worker가 GitHub에서 직접 읽어 바로 보여줌
+- 오늘의 말씀: GitHub Actions가 매일 00:00 서버 호출(`CRON_SECRET`) → 서버가 가톨릭굿뉴스에서 읽어 D1 저장, 실패 시 GitHub 실패 메일 그대로 받음. `firebase-admin`·Firestore 의존 제거
+- 홈페이지 스크립트: `site-data.js`가 `/api/home`을 한 번 받아 공지·주보·갤러리·팝업·오늘의 말씀이 같이 씀. 알림함은 Firestore 실시간 대신 열 때·화면 복귀 시·새 알림 올 때 다시 받음. 홈페이지에서 Firestore SDK 제거
+- 기존 데이터 전부 D1로 이전: 공지 2, 주보 1(2면), 앨범 1(사진 6), 팝업, 알림함 20, 구독자 3, 오늘의 말씀
+- Firebase 승인 도메인에 새 주소 추가(서비스 계정 API로), Worker 비밀값 `FIREBASE_SERVICE_ACCOUNT`·`CRON_SECRET` 설정, GitHub Actions 비밀값 `CRON_SECRET` 설정
+- 테스트: `npm test`(로컬 D1 + 가짜 구글/GitHub로 13개: 권한, 공지·주보·앨범 CRUD, 사진 커밋·정리, 위조 방지, 배포 전 사진 표시, 구독, 자동 갱신 암호, 말씀 추출), `npm run test:browser`(홈페이지·관리자 화면 실제 클릭) 모두 통과. 실제 사이트에서도 데이터·오류 없음 확인
 
 ### 1. 초기 구축 & 배포 이전
 - 초기 홈페이지 구축 (Initial commit)
@@ -56,7 +71,7 @@
 - **주의:** 미사시간·주소·전화번호 등 고정 문구를 바꾸면 `assets/js/i18n.js`의 외국어 문장도 같이 고칠 것
 
 ### 5. 오늘의 말씀
-- 자동 갱신 스트립 추가 (용머리성당 방식 참고), Firestore 기반 자동 갱신으로 전환 (Netlify 배포 크레딧 절약 목적)
+- 자동 갱신 스트립 추가 (용머리성당 방식 참고), Firestore 기반 자동 갱신으로 전환 (Netlify 배포 크레딧 절약 목적) → 2026-09-26 D1 저장으로 다시 전환(위 0번)
 - **2026-09-26: 인용 정규식 버그 수정** — 복음 구절 인용이 `9,43ㄴ-45`처럼 한글 자모로 절을 세분화하는 경우, 기존 정규식이 숫자·쉼표·하이픈만 허용해 매칭 실패 → 자동 갱신 중단(실패 메일 발생). 자모(ㄱ-ㅎ) 허용하도록 정규식 수정, 용머리성당(project)에도 동일하게 반영.
 
 ### 6. UI/UX 다듬기
@@ -76,6 +91,14 @@
 ---
 
 ## 앞으로 작업이 필요할 수 있는 부분 (제안 — 명시적 지시는 없었음, 확인 후 진행)
+
+- [ ] **사용자 직접: GitHub 토큰(`GITHUB_TOKEN`) 만들어 Worker 비밀값에 넣기** — 없으면 관리자 페이지에서 사진 저장 불가 (글은 됨). `docs/관리자-설정-안내.md` A항목
+- [ ] **사용자 직접: Workers 자동 배포 연결** (대시보드 Settings → Build → Connect) — 안 하면 코드·사진 커밋이 자동 배포되지 않음 (사진은 GitHub에서 직접 읽어 보이긴 함). B항목
+- [ ] **사용자 직접: 카카오맵에 새 도메인 등록** — 안 하면 지도 대신 "카카오맵에서 열기" 버튼. C항목
+- [ ] 예전 Cloudflare Pages 프로젝트(`seohakdong-catholic-church.pages.dev`) 삭제 여부 결정 — 이번 구조 변경 뒤로는 예전 주소가 제대로 안 뜸. 삭제 시 그 안의 예전 GitHub 토큰(classic, repo 전체 권한)도 GitHub에서 폐기 권장
+- [ ] 쓰지 않게 된 것 정리 여부: GitHub Actions 비밀값 `FIREBASE_SERVICE_ACCOUNT`, Firebase의 Firestore 데이터(모두 D1로 옮김)
+- [ ] 같은 구조로 용머리성당(project) 이전 → 해월피정의집·samudaejeon 공통 부분(구글 로그인·주간 D1 백업) 맞추기
+- [ ] D1 주간 자동 백업(비공개 저장소) 추가
 
 - [ ] **용머리성당(project)의 "전체 일정 보기" 인쇄 기능을 이쪽에도 이식할지 확인.** (`sibling-project-functional-parity` 메모리: 포팅 시 겉모습뿐 아니라 JS 로직·버그 수정까지 동일하게 맞출 것)
 - [ ] 오늘의 말씀 자동 갱신 스크립트가 앞으로도 매일 정상 실행되는지 주기적으로 확인 (2026-09-26에 한글 자모 절 표기로 한 차례 실패했었음)
