@@ -1,6 +1,7 @@
 // 알림함 — 성당에서 보낸 알림을 홈페이지 안에도 목록으로 남겨서,
 // 푸시 알림을 못 받는 분(아이폰 등)도 볼 수 있고, 각자 필요 없는 건 지울 수 있게 한다.
 (function () {
+  const I18N = window.I18N || { lang: 'ko', locale: 'ko-KR', t: (key, ko) => ko, translateElements: () => {} };
   const bellBtns = document.querySelectorAll('.notif-bell');
   const panel = document.getElementById('notifPanel');
   const listEl = document.getElementById('notifList');
@@ -28,7 +29,7 @@
 
   function formatDate(date) {
     if (!date) return '';
-    return date.toLocaleString('ko-KR', { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    return date.toLocaleString(I18N.locale, { month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   }
 
   let items = [];
@@ -50,7 +51,7 @@
       const delBtn = document.createElement('button');
       delBtn.type = 'button';
       delBtn.className = 'notif-item-del';
-      delBtn.setAttribute('aria-label', '이 알림 지우기');
+      delBtn.setAttribute('aria-label', I18N.t('notif_delete', '이 알림 지우기'));
       delBtn.textContent = '✕';
       delBtn.addEventListener('click', () => {
         addDismissed(it.id);
@@ -68,6 +69,7 @@
       li.appendChild(delBtn);
       listEl.appendChild(li);
     });
+    I18N.translateElements(listEl.querySelectorAll('.notif-item-title, .notif-item-text'));
   }
 
   // 배지 숫자 = 지우지 않고 알림함에 남아있는 알림 개수 (읽었는지 여부와 무관)

@@ -336,6 +336,83 @@ async function sendPush(env, origin, title, body) {
   };
 }
 
+// ---------- 외국어 자동 번역 (홈페이지 방문객용, 로그인 불필요) ----------
+// 공지·주보·갤러리·팝업·알림함처럼 관리자가 한국어로 올리는 내용을 영어/일본어/중국어로 보여줄 때 쓴다.
+// Cloudflare Pages 설정 > Bindings 에 Workers AI를 이름 `AI`로 연결해야 동작하며,
+// 연결 전이거나 번역에 실패하면 원문(한국어)을 그대로 돌려줘서 홈페이지가 깨지지 않는다.
+
+const MT_MODEL = '@cf/meta/m2m100-1.2b';
+const MT_TARGETS = new Set(['en', 'ja', 'zh']);
+const MT_MAX_TEXTS = 40;
+const MT_MAX_CHARS = 1000;
+const MT_CONCURRENCY = 6;
+
+async function sha256Hex(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function translateOne(env, url, target, text) {
+  if (!/[가-힣]/.test(text)) return text;
+  // 같은 문장은 한 번만 번역하도록 Cloudflare 캐시에 30일간 보관한다 (캐시를 못 쓰는 환경이면 그냥 매번 번역)
+  let cache = null;
+  let cacheKey = null;
+  try {
+    cache = caches.default;
+    cacheKey = new Request(`${url.origin}/api/translate-cache/${target}/${await sha256Hex(text)}`);
+    const hit = await cache.match(cacheKey);
+    if (hit) return await hit.text();
+  } catch (e) { cache = null; }
+
+  const result = await env.AI.run(MT_MODEL, { text, source_lang: 'ko', target_lang: target });
+  const out = result && typeof result.translated_text === 'string' ? result.translated_text.trim() : '';
+  if (!out) return text;
+  if (cache) {
+    try {
+      await cache.put(cacheKey, new Response(out, { headers: { 'Cache-Control': 'public, max-age=2592000' } }));
+    } catch (e) { /* 캐시 저장 실패는 무시 */ }
+  }
+  return out;
+}
+
+async function handleTranslate(request, env, url) {
+  // 다른 사이트에서 이 번역기를 가져다 쓰지 못하게, 브라우저가 알려주는 출처가 이 홈페이지일 때만 받는다
+  const origin = request.headers.get('Origin');
+  if (origin) {
+    let host = '';
+    try { host = new URL(origin).host; } catch (e) { host = ''; }
+    if (host !== url.host) return json({ error: 'forbidden' }, 403);
+  }
+
+  let payload = null;
+  try { payload = await request.json(); } catch (e) { payload = null; }
+  const target = String((payload && payload.target) || '');
+  const texts = (Array.isArray(payload && payload.texts) ? payload.texts : [])
+    .slice(0, MT_MAX_TEXTS)
+    .map((s) => String(s == null ? '' : s).slice(0, MT_MAX_CHARS));
+  if (!MT_TARGETS.has(target) || !texts.length) return json({ error: 'bad request' }, 400);
+
+  if (!env.AI) return json({ texts, translated: false });
+
+  const out = texts.slice();
+  let next = 0;
+  let failed = 0;
+  async function worker() {
+    while (next < texts.length) {
+      const i = next++;
+      try {
+        out[i] = await translateOne(env, url, target, texts[i]);
+      } catch (e) {
+        failed++;
+        out[i] = texts[i];
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(MT_CONCURRENCY, texts.length) }, worker));
+  if (failed) console.error(`번역 실패 ${failed}건 (${target})`);
+  return json({ texts: out, translated: failed < texts.length });
+}
+
 // ---------- 라우팅 ----------
 
 export async function onRequest(context) {
@@ -344,6 +421,16 @@ export async function onRequest(context) {
   const route = url.pathname.replace(/^\/api\/?/, '').replace(/\/+$/, '');
 
   if (request.method === 'OPTIONS') return new Response(null, { status: 204 });
+
+  // 홈페이지 방문객용 번역은 관리자 로그인 없이 쓴다
+  if (route === 'translate' && request.method === 'POST') {
+    try {
+      return await handleTranslate(request, env, url);
+    } catch (err) {
+      console.error(err);
+      return json({ error: '번역 중 오류가 발생했습니다.' }, 500);
+    }
+  }
 
   try {
     const auth = await requireAdmin(request, env);

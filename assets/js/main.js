@@ -1,5 +1,14 @@
 // 서학동성당 홈페이지 — 원페이지 스크립트
 document.addEventListener("DOMContentLoaded", () => {
+  // 다국어(i18n.js)를 못 불러와도 한국어로는 그대로 동작하도록 대체 함수를 둔다
+  const I18N = window.I18N || {
+    lang: "ko",
+    t: (key, ko, vars) => (vars ? ko.replace(/\{(\w+)\}/g, (_, k) => vars[k]) : ko),
+    translateText: (s) => Promise.resolve(s),
+    translateElements: () => {},
+  };
+  const t = I18N.t;
+
   // 모바일 메뉴
   const toggle = document.getElementById("navToggle");
   const menu = document.getElementById("navMenu");
@@ -29,8 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const url = location.href;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(url).then(
-          () => flashLabel("링크가 복사됐어요!"),
-          () => flashLabel("복사에 실패했어요")
+          () => flashLabel(t("share_copied", "링크가 복사됐어요!")),
+          () => flashLabel(t("share_failed", "복사에 실패했어요"))
         );
         return;
       }
@@ -43,9 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
       temp.select();
       try {
         document.execCommand("copy");
-        flashLabel("링크가 복사됐어요!");
+        flashLabel(t("share_copied", "링크가 복사됐어요!"));
       } catch (err) {
-        flashLabel("복사에 실패했어요");
+        flashLabel(t("share_failed", "복사에 실패했어요"));
       }
       document.body.removeChild(temp);
     }
@@ -107,10 +116,13 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="notice-date">${escapeHtml(n.date || "")}</span>
               <span class="notice-plus"></span>
             </button>
-            <div class="notice-body"><div class="notice-body-inner">${escapeHtml(n.body || "").replace(/\n/g, "<br>")}</div></div>
+            <div class="notice-body"><div class="notice-body-inner"></div></div>
           </div>
         `).join("");
+        // 본문은 줄바꿈을 CSS(white-space: pre-line)로 살리고 글자로만 넣는다 — 자동 번역도 줄 단위로 된다
+        noticeList.querySelectorAll(".notice-body-inner").forEach((el, i) => { el.textContent = items[i].body || ""; });
         bindNoticeAccordions(noticeList);
+        I18N.translateElements(noticeList.querySelectorAll(".notice-tag, .notice-title, .notice-body-inner"));
       })
       .catch(() => {});
   }
@@ -128,10 +140,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const items = (data && data.items) || [];
         if (!items.length) {
           latestEl.innerHTML = `
-            <div><p class="eyebrow" style="margin-bottom:6px;">최근 게시된 주보</p><h3 style="margin:0;">주보 자료 준비중</h3></div>
-            <span class="badge badge--todo">준비중</span>
+            <div><p class="eyebrow" style="margin-bottom:6px;">${escapeHtml(t("bulletin_latest", "최근 게시된 주보"))}</p><h3 style="margin:0;">${escapeHtml(t("bulletin_preparing_title", "주보 자료 준비중"))}</h3></div>
+            <span class="badge badge--todo">${escapeHtml(t("bulletin_preparing", "준비중"))}</span>
           `;
-          weekListEl.innerHTML = '<li class="bulletin-empty-note">아직 등록된 주보가 없습니다. 자료가 확보되는 대로 추가하겠습니다.</li>';
+          weekListEl.innerHTML = `<li class="bulletin-empty-note">${escapeHtml(t("bulletin_empty", "아직 등록된 주보가 없습니다. 자료가 확보되는 대로 추가하겠습니다."))}</li>`;
           return;
         }
 
@@ -148,13 +160,14 @@ document.addEventListener("DOMContentLoaded", () => {
         function renderLatest() {
           latestEl.innerHTML = `
             <div>
-              <p class="eyebrow" style="margin-bottom:6px;">최근 게시된 주보 (${escapeHtml(latest.date || "")})</p>
+              <p class="eyebrow" style="margin-bottom:6px;">${escapeHtml(t("bulletin_latest_date", "최근 게시된 주보 ({d})", { d: latest.date || "" }))}</p>
               <h3 style="margin:0;">${escapeHtml(latest.title || "")}</h3>
             </div>
-            <button class="btn btn--primary" type="button" id="bulletinLatestBtn">주보 보기</button>
+            <button class="btn btn--primary" type="button" id="bulletinLatestBtn">${escapeHtml(t("bulletin_view", "주보 보기"))}</button>
           `;
           const btn = document.getElementById("bulletinLatestBtn");
           if (btn) btn.addEventListener("click", () => openBulletin(latest));
+          I18N.translateElements(latestEl.querySelectorAll("h3"));
         }
 
         function renderYearTabs() {
@@ -163,7 +176,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const btn = document.createElement("button");
             btn.type = "button";
             btn.className = "year-tab" + (y === currentYear ? " active" : "");
-            btn.textContent = y + "년";
+            btn.textContent = t("bulletin_year", "{y}년", { y });
             btn.addEventListener("click", () => {
               currentYear = currentYear === y ? null : y;
               renderYearTabs();
@@ -176,14 +189,14 @@ document.addEventListener("DOMContentLoaded", () => {
         function renderWeekList() {
           weekListEl.innerHTML = "";
           if (!currentYear) {
-            weekListEl.innerHTML = '<li class="bulletin-empty-note">연도를 선택하면 주보 목록이 표시됩니다.</li>';
+            weekListEl.innerHTML = `<li class="bulletin-empty-note">${escapeHtml(t("bulletin_pick_year", "연도를 선택하면 주보 목록이 표시됩니다."))}</li>`;
             return;
           }
           const list = (byYear[currentYear] || [])
             .slice()
             .sort((a, b) => String(b.date).localeCompare(String(a.date)));
           if (!list.length) {
-            weekListEl.innerHTML = '<li class="bulletin-empty-note">아직 등록된 주보가 없습니다. 자료가 확보되는 대로 추가하겠습니다.</li>';
+            weekListEl.innerHTML = `<li class="bulletin-empty-note">${escapeHtml(t("bulletin_empty", "아직 등록된 주보가 없습니다. 자료가 확보되는 대로 추가하겠습니다."))}</li>`;
             return;
           }
           list.forEach((item) => {
@@ -196,6 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
             li.appendChild(btn);
             weekListEl.appendChild(li);
           });
+          I18N.translateElements(weekListEl.querySelectorAll(".wtitle"));
         }
 
         function openBulletin(item) {
@@ -212,16 +226,20 @@ document.addEventListener("DOMContentLoaded", () => {
             images.forEach((src, i) => {
               const img = document.createElement("img");
               img.src = src;
-              img.alt = `${item.date || ""} 주보 ${i + 1}면`;
+              img.alt = t("bulletin_page_alt", "{d} 주보 {n}면", { d: item.date || "", n: i + 1 });
               img.className = "lightbox-page";
               img.loading = "lazy";
               lightboxImg.appendChild(img);
             });
           } else {
             lightboxImg.classList.add("placeholder-photo");
-            lightboxImg.textContent = "사진 준비중";
+            lightboxImg.textContent = t("photo_preparing", "사진 준비중");
           }
-          lightboxCap.textContent = `${item.date || ""} · ${item.title || ""}` + (images.length > 1 ? ` (${images.length}면, 아래로 넘겨 보세요)` : "");
+          const pagesNote = images.length > 1 ? t("bulletin_pages", " ({n}면, 아래로 넘겨 보세요)", { n: images.length }) : "";
+          lightboxCap.textContent = `${item.date || ""} · ${item.title || ""}` + pagesNote;
+          I18N.translateText(item.title || "").then((title) => {
+            lightboxCap.textContent = `${item.date || ""} · ${title}` + pagesNote;
+          });
           lightbox.classList.add("open");
         }
 
@@ -250,10 +268,10 @@ document.addEventListener("DOMContentLoaded", () => {
     lightboxImg.appendChild(img);
     if (total > 1) {
       const prev = document.createElement("button");
-      prev.type = "button"; prev.className = "lb-nav lb-nav--prev"; prev.setAttribute("aria-label", "이전 사진"); prev.textContent = "‹";
+      prev.type = "button"; prev.className = "lb-nav lb-nav--prev"; prev.setAttribute("aria-label", t("photo_prev", "이전 사진")); prev.textContent = "‹";
       prev.addEventListener("click", (e) => { e.stopPropagation(); stepViewer(-1); });
       const next = document.createElement("button");
-      next.type = "button"; next.className = "lb-nav lb-nav--next"; next.setAttribute("aria-label", "다음 사진"); next.textContent = "›";
+      next.type = "button"; next.className = "lb-nav lb-nav--next"; next.setAttribute("aria-label", t("photo_next", "다음 사진")); next.textContent = "›";
       next.addEventListener("click", (e) => { e.stopPropagation(); stepViewer(1); });
       const counter = document.createElement("span");
       counter.className = "lb-counter"; counter.textContent = `${viewer.index + 1} / ${total}`;
@@ -261,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // 다음 사진을 미리 받아 두면 넘길 때 바로 뜬다
       const pre = new Image(); pre.src = viewer.photos[(viewer.index + 1) % total].image;
     }
-    lightboxCap.textContent = viewer.caption + (total > 1 ? ` · ${total}장` : "");
+    lightboxCap.textContent = viewer.caption + (total > 1 ? t("gallery_count", " · {n}장", { n: total }) : "");
   }
   function stepViewer(delta) {
     const total = viewer.photos.length;
@@ -277,6 +295,10 @@ document.addEventListener("DOMContentLoaded", () => {
     viewer.caption = `${album.date || ""} · ${album.titleMain || ""}`;
     renderViewer();
     lightbox.classList.add("open");
+    I18N.translateText(album.titleMain || "").then((title) => {
+      viewer.caption = `${album.date || ""} · ${title}`;
+      if (lightbox.classList.contains("open") && lightboxImg.classList.contains("lightbox-img--viewer")) renderViewer();
+    });
   }
   if (lightbox && lightboxImg && lightboxCap) {
     const closeBtn = document.getElementById("lightboxClose");
@@ -351,7 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const btn = document.createElement("button");
             btn.type = "button";
             btn.className = "year-tab" + (decade === currentDecade ? " active" : "");
-            btn.textContent = decade + "년대";
+            btn.textContent = t("gallery_decade", "{d}년대", { d: decade });
             if (has) {
               btn.addEventListener("click", () => {
                 currentDecade = decade;
@@ -360,7 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
               });
             } else {
               btn.disabled = true;
-              btn.title = "자료 준비 중";
+              btn.title = t("gallery_decade_empty", "자료 준비 중");
             }
             yearTabsEl.appendChild(btn);
           });
@@ -372,7 +394,7 @@ document.addEventListener("DOMContentLoaded", () => {
           currentPage = Math.min(Math.max(1, page), totalPages);
           grid.innerHTML = "";
           if (!filtered.length) {
-            grid.innerHTML = '<div class="bulletin-empty-note">아직 등록된 사진이 없습니다. 자료가 확보되는 대로 추가하겠습니다.</div>';
+            grid.innerHTML = `<div class="bulletin-empty-note">${escapeHtml(t("gallery_empty", "아직 등록된 사진이 없습니다. 자료가 확보되는 대로 추가하겠습니다."))}</div>`;
             renderPagination(0);
             return;
           }
@@ -396,6 +418,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.addEventListener("click", () => openAlbum(album, 0));
             grid.appendChild(btn);
           });
+          I18N.translateElements(grid.querySelectorAll(".gallery-cap-title, .gallery-cap-extra"));
           renderPagination(totalPages);
         }
 
@@ -424,8 +447,8 @@ document.addEventListener("DOMContentLoaded", () => {
             pagination.appendChild(span);
           };
 
-          addBtn("처음", 1, { disabled: currentPage === 1 });
-          addBtn("이전", currentPage - 1, { disabled: currentPage === 1 });
+          addBtn(t("page_first", "처음"), 1, { disabled: currentPage === 1 });
+          addBtn(t("page_prev", "이전"), currentPage - 1, { disabled: currentPage === 1 });
 
           const WINDOW = 2;
           const pagesToShow = new Set([1, totalPages]);
@@ -439,8 +462,8 @@ document.addEventListener("DOMContentLoaded", () => {
             prev = p;
           });
 
-          addBtn("다음", currentPage + 1, { disabled: currentPage === totalPages });
-          addBtn("마지막", totalPages, { disabled: currentPage === totalPages });
+          addBtn(t("page_next", "다음"), currentPage + 1, { disabled: currentPage === totalPages });
+          addBtn(t("page_last", "마지막"), totalPages, { disabled: currentPage === totalPages });
         }
 
         renderYearTabs();

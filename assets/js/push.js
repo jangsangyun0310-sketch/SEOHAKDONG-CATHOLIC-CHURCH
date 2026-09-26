@@ -1,5 +1,6 @@
 // 웹 푸시 알림 — 전달사항(공지)이 있을 때 신자분들 휴대폰으로 알림을 보내는 기능
 (function () {
+  const t = window.I18N ? I18N.t : (key, ko) => ko;
   const btn = document.getElementById('pushAppBtn');
   const label = document.getElementById('pushAppBtnLabel');
   const modal = document.getElementById('pushModal');
@@ -43,12 +44,12 @@
   const defaultLabel = label.textContent;
   function setLabel(text, temporary) {
     label.textContent = text;
-    if (temporary) setTimeout(() => { label.textContent = subscribedNow() ? '알림 받는 중 ✓' : defaultLabel; }, 2200);
+    if (temporary) setTimeout(() => { label.textContent = subscribedNow() ? t('push_subscribed', '알림 받는 중 ✓') : defaultLabel; }, 2200);
   }
   function subscribedNow() { return localStorage.getItem(STORAGE_KEY) === '1'; }
   function reflectState() {
     btn.classList.toggle('is-subscribed', subscribedNow());
-    label.textContent = subscribedNow() ? '알림 받는 중 ✓' : defaultLabel;
+    label.textContent = subscribedNow() ? t('push_subscribed', '알림 받는 중 ✓') : defaultLabel;
   }
   reflectState();
 
@@ -66,7 +67,7 @@
     if (listeningForMessages) return;
     listeningForMessages = true;
     messaging.onMessage((payload) => {
-      const title = (payload.notification && payload.notification.title) || '서학동성당';
+      const title = (payload.notification && payload.notification.title) || t('hero_title', '서학동성당');
       const body = (payload.notification && payload.notification.body) || '';
       const id = payload.data && payload.data.announcementId;
       navigator.serviceWorker.getRegistration('service-worker.js').then((reg) => {
@@ -107,7 +108,7 @@
     if (isIOS && !isStandalone) { openModal('pushGuideIOS'); return; }
     if (Notification.permission === 'denied') { openModal('pushGuideDenied'); return; }
 
-    setLabel('알림 켜는 중…');
+    setLabel(t('push_turning_on', '알림 켜는 중…'));
     try {
       const permission = await Notification.requestPermission();
       if (permission !== 'granted') { reflectState(); return; }
@@ -131,13 +132,13 @@
       await replaceStoredToken(db, token);
 
       localStorage.setItem(STORAGE_KEY, '1');
-      setLabel('알림 받는 중 ✓', true);
+      setLabel(t('push_subscribed', '알림 받는 중 ✓'), true);
       btn.classList.add('is-subscribed');
 
       listenForForegroundMessages(messaging);
     } catch (err) {
       console.error(err);
-      setLabel('알림 켜기 실패, 다시 눌러주세요', true);
+      setLabel(t('push_failed', '알림 켜기 실패, 다시 눌러주세요'), true);
     }
   }
 
@@ -155,7 +156,7 @@
       localStorage.removeItem(STORAGE_KEY);
       localStorage.removeItem(TOKEN_STORAGE_KEY);
       btn.classList.remove('is-subscribed');
-      setLabel('🔕 알림 꺼짐', true);
+      setLabel(t('push_off', '🔕 알림 꺼짐'), true);
     }
   }
 

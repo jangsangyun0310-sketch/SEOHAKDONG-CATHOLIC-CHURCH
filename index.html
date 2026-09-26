@@ -30,45 +30,95 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
-<link rel="stylesheet" href="assets/css/style.css?v=202609260">
+<link rel="stylesheet" href="assets/css/style.css?v=202609261">
+<!-- 외국어로 볼지 먼저 정한다 (주소의 ?lang=en > 전에 고른 언어 > 휴대폰 언어 설정).
+     한국어가 아니면 번역이 끝날 때까지 잠깐 화면을 가려서 한국어가 번쩍 보이지 않게 한다. -->
+<script>
+(function () {
+  var LANGS = ['ko', 'en', 'ja', 'zh'], KEY = 'seohakdong-lang', lang = '';
+  try {
+    var q = new URLSearchParams(location.search).get('lang');
+    if (LANGS.indexOf(q) >= 0) { lang = q; localStorage.setItem(KEY, q); }
+    else { var s = localStorage.getItem(KEY); if (LANGS.indexOf(s) >= 0) lang = s; }
+  } catch (e) {}
+  if (!lang) {
+    var n = ((navigator.languages && navigator.languages[0]) || navigator.language || 'ko').toLowerCase();
+    lang = n.indexOf('ko') === 0 ? 'ko' : n.indexOf('ja') === 0 ? 'ja' : n.indexOf('zh') === 0 ? 'zh' : 'en';
+  }
+  window.__LANG = lang;
+  if (lang !== 'ko') {
+    var root = document.documentElement;
+    root.lang = lang === 'zh' ? 'zh-CN' : lang;
+    root.classList.add('i18n-pending');
+    setTimeout(function () { root.classList.remove('i18n-pending'); }, 3000);
+  }
+})();
+</script>
 </head>
 <body id="top">
 
 <header class="site-header">
   <div class="container nav-bar">
-    <a href="./" class="brand" title="홈페이지 새로고침">
+    <a href="./" class="brand" title="홈페이지 새로고침" data-i18n-title="brand_reload">
       <img src="assets/img/logo-horizontal-trimmed.png" alt="서학동성당 SEOHAKDONG CATHOLIC CHURCH SINCE 1968" class="brand-logo">
     </a>
     <div class="header-right" id="navMenu">
       <ul class="nav-menu">
         <li class="nav-menu-bell-item">
-          <button type="button" class="notif-bell notif-bell--desktop" id="notifBellBtnDesktop" aria-label="알림함 열기">
+          <div class="lang-switch lang-switch--desktop">
+            <button type="button" class="lang-btn" aria-haspopup="true" aria-expanded="false" aria-label="Language / 언어">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg>
+              <span class="lang-btn-label"></span>
+            </button>
+            <div class="lang-menu" role="menu">
+              <button type="button" role="menuitem" data-lang="ko">한국어</button>
+              <button type="button" role="menuitem" data-lang="en">English</button>
+              <button type="button" role="menuitem" data-lang="ja">日本語</button>
+              <button type="button" role="menuitem" data-lang="zh">中文</button>
+              <p class="mt-note" data-i18n="mt_note" hidden></p>
+            </div>
+          </div>
+          <button type="button" class="notif-bell notif-bell--desktop" id="notifBellBtnDesktop" aria-label="알림함 열기" data-i18n-aria="bell_open">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             <span class="notif-bell-badge" hidden></span>
           </button>
         </li>
-        <li><a href="#intro">본당소개</a></li>
-        <li><a href="#notice">공지사항·주보</a></li>
-        <li><a href="#gallery">갤러리</a></li>
-        <li><a href="#location">오시는 길</a></li>
+        <li><a href="#intro" data-i18n="nav_intro">본당소개</a></li>
+        <li><a href="#notice" data-i18n="nav_notice">공지사항·주보</a></li>
+        <li><a href="#gallery" data-i18n="nav_gallery">갤러리</a></li>
+        <li><a href="#location" data-i18n="nav_location">오시는 길</a></li>
       </ul>
       <div class="quicklinks-row">
-        <a href="http://cafe.naver.com/seohakdong" target="_blank" rel="noopener" class="pill-link"><img class="pill-ico" src="https://cafe.naver.com/favicon.ico" alt="">네이버카페</a>
-        <a href="https://www.jcatholic.or.kr" target="_blank" rel="noopener" class="pill-link"><img class="pill-ico" src="https://www.google.com/s2/favicons?domain=jcatholic.or.kr&sz=64" alt="">전주교구</a>
+        <a href="http://cafe.naver.com/seohakdong" target="_blank" rel="noopener" class="pill-link"><img class="pill-ico" src="https://cafe.naver.com/favicon.ico" alt=""><span data-i18n="ql_cafe">네이버카페</span></a>
+        <a href="https://www.jcatholic.or.kr" target="_blank" rel="noopener" class="pill-link"><img class="pill-ico" src="https://www.google.com/s2/favicons?domain=jcatholic.or.kr&sz=64" alt=""><span data-i18n="ql_diocese">전주교구</span></a>
         <a href="https://www.cbck.or.kr" target="_blank" rel="noopener" class="pill-link"><img class="pill-ico" src="https://www.cbck.or.kr/favicon.ico" alt="">CBCK</a>
-        <a href="https://www.catholic.or.kr" target="_blank" rel="noopener" class="pill-link"><img class="pill-ico" src="https://www.catholic.or.kr/assets/images/good/gn-icon.png" alt="">굿뉴스</a>
-        <a href="https://www.cpbc.co.kr/onair.html?channel=radio" target="_blank" rel="noopener" class="pill-link"><img class="pill-ico" src="https://www.cpbc.co.kr/favicon.ico" alt="">cpbc 평화방송</a>
+        <a href="https://www.catholic.or.kr" target="_blank" rel="noopener" class="pill-link"><img class="pill-ico" src="https://www.catholic.or.kr/assets/images/good/gn-icon.png" alt=""><span data-i18n="ql_goodnews">굿뉴스</span></a>
+        <a href="https://www.cpbc.co.kr/onair.html?channel=radio" target="_blank" rel="noopener" class="pill-link"><img class="pill-ico" src="https://www.cpbc.co.kr/favicon.ico" alt=""><span data-i18n="ql_cpbc">cpbc 평화방송</span></a>
         <button type="button" class="pill-link" id="shareBtn">
           <svg class="pill-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          <span id="shareBtnLabel">공유하기</span>
+          <span id="shareBtnLabel" data-i18n="share">공유하기</span>
         </button>
       </div>
     </div>
-    <button type="button" class="notif-bell notif-bell--mobile" id="notifBellBtnMobile" aria-label="알림함 열기">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <span class="notif-bell-badge" hidden></span>
-    </button>
-    <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false"><span></span></button>
+    <div class="header-mobile-actions">
+      <div class="lang-switch lang-switch--mobile">
+        <button type="button" class="lang-btn" aria-haspopup="true" aria-expanded="false" aria-label="Language / 언어">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg>
+        </button>
+        <div class="lang-menu" role="menu">
+          <button type="button" role="menuitem" data-lang="ko">한국어</button>
+          <button type="button" role="menuitem" data-lang="en">English</button>
+          <button type="button" role="menuitem" data-lang="ja">日本語</button>
+          <button type="button" role="menuitem" data-lang="zh">中文</button>
+          <p class="mt-note" data-i18n="mt_note" hidden></p>
+        </div>
+      </div>
+      <button type="button" class="notif-bell notif-bell--mobile" id="notifBellBtnMobile" aria-label="알림함 열기" data-i18n-aria="bell_open">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-bell-badge" hidden></span>
+      </button>
+      <button class="nav-toggle" id="navToggle" aria-label="메뉴 열기" data-i18n-aria="menu_open" aria-expanded="false"><span></span></button>
+    </div>
   </div>
 
   <!-- 아래 날짜/전례색/말씀은 매일 자동으로 Firestore(site_data/todayword)에서 불러와 채워집니다 (assets/js/todayword.js).
@@ -84,7 +134,7 @@
         <strong id="liturgyFeast">연중 제23주간 토요일</strong>
         <span id="liturgyVerse">너희는 어찌하여 나를 “주님, 주님!” 하고 부르면서 내가 말하는 것은 실행하지 않느냐? (루카 6,43-49)</span>
       </div>
-      <a href="https://maria.catholic.or.kr/mobile/missa/missa_view.asp?today=on" target="_blank" rel="noopener" class="btn btn--outline liturgy-cta">오늘의 미사 보기</a>
+      <a href="https://maria.catholic.or.kr/mobile/missa/missa_view.asp?today=on" target="_blank" rel="noopener" class="btn btn--outline liturgy-cta" data-i18n="liturgy_cta">오늘의 미사 보기</a>
     </div>
   </div>
 </header>
@@ -105,39 +155,39 @@
   </svg>
   <div class="container hero-grid">
     <div class="hero-inner">
-      <p class="eyebrow">천주교 전주교구</p>
-      <h1>서학동성당</h1>
-      <p class="hero-quote">“치명자산의 품, 함께 걷는 신앙의 길”</p>
-      <p>전주의 역사와 치명자산의 순교 신앙을 품고, 이웃과 사랑을 나누며<br>하느님을 향해 걸어갑니다.</p>
-      <p>신앙의 기쁨을 함께 나누고, 세대를 이어 믿음을 전하며, 일상의 삶 속에서<br>복음의 가치를 실천하는 따뜻한 공동체.</p>
-      <p>서학동성당입니다.</p>
+      <p class="eyebrow" data-i18n="hero_eyebrow">천주교 전주교구</p>
+      <h1 data-i18n="hero_title">서학동성당</h1>
+      <p class="hero-quote" data-i18n="hero_quote">“치명자산의 품, 함께 걷는 신앙의 길”</p>
+      <p data-i18n-html="hero_p1">전주의 역사와 치명자산의 순교 신앙을 품고, 이웃과 사랑을 나누며<br>하느님을 향해 걸어갑니다.</p>
+      <p data-i18n-html="hero_p2">신앙의 기쁨을 함께 나누고, 세대를 이어 믿음을 전하며, 일상의 삶 속에서<br>복음의 가치를 실천하는 따뜻한 공동체.</p>
+      <p data-i18n="hero_p3">서학동성당입니다.</p>
       <div class="hero-actions">
-        <a href="#location" class="btn btn--primary">오시는 길</a>
+        <a href="#location" class="btn btn--primary" data-i18n="hero_btn_location">오시는 길</a>
       </div>
     </div>
 
     <div class="hero-mass-col">
       <div class="hero-facts-panel">
-        <div class="hero-facts-title">미사시간 안내</div>
+        <div class="hero-facts-title" data-i18n="mass_title">미사시간 안내</div>
         <div class="hero-mass-row hero-mass-row--main">
-          <span>토요일</span>
-          <strong>18:00<small>주일 저녁미사(청소년·청년)</small></strong>
+          <span data-i18n="mass_sat">토요일</span>
+          <strong>18:00<small data-i18n="mass_sat_note">주일 저녁미사(청소년·청년)</small></strong>
         </div>
         <div class="hero-mass-row hero-mass-row--main">
-          <span>주일</span>
-          <strong>08:00 · 10:30<small>교중미사</small></strong>
+          <span data-i18n="mass_sun">주일</span>
+          <strong>08:00 · 10:30<small data-i18n="mass_sun_note">교중미사</small></strong>
         </div>
         <div class="hero-mass-weekday">
-          <div><span>월</span><strong>06:00</strong></div>
-          <div><span>화</span><strong>19:00</strong></div>
-          <div><span>수</span><strong>10:00</strong></div>
-          <div><span>목</span><strong>19:00</strong></div>
-          <div><span>금</span><strong>10:00</strong></div>
+          <div><span data-i18n="day_mon">월</span><strong>06:00</strong></div>
+          <div><span data-i18n="day_tue">화</span><strong>19:00</strong></div>
+          <div><span data-i18n="day_wed">수</span><strong>10:00</strong></div>
+          <div><span data-i18n="day_thu">목</span><strong>19:00</strong></div>
+          <div><span data-i18n="day_fri">금</span><strong>10:00</strong></div>
         </div>
       </div>
       <div class="hero-mass-contact">
         <span>📞 063-286-4929</span>
-        <span>⛪ 전주시 완산구 서학로 51 (우 55101)</span>
+        <span data-i18n="address_short">⛪ 전주시 완산구 서학로 51 (우 55101)</span>
       </div>
     </div>
   </div>
@@ -147,46 +197,46 @@
 <section class="section section--alt" id="intro">
   <div class="container">
     <div class="section-head">
-      <h2>본당 소개</h2>
-      <p class="verse-sub">“그러나 나와 내 집안은 주님을 섬기리라.” <span class="verse-cite-inline">여호수아기 24장 15절</span></p>
+      <h2 data-i18n="intro_title">본당 소개</h2>
+      <p class="verse-sub" data-i18n-html="intro_verse">“그러나 나와 내 집안은 주님을 섬기리라.” <span class="verse-cite-inline">여호수아기 24장 15절</span></p>
     </div>
   </div>
 
   <div class="container grid grid--2" style="gap:56px; align-items:end; margin-top:8px;">
     <div>
       <div class="intro-photo photo-tile">
-        <img src="assets/img/church-exterior.jpg" alt="서학동성당 성당 외관">
+        <img src="assets/img/church-exterior.jpg" alt="서학동성당 성당 외관" data-i18n-alt="intro_photo_alt">
       </div>
     </div>
 
     <div>
-      <p class="section-desc">전동성당에서 분리된 서학동성당은 1968년에<br class="br-mobile"> 설립되어<br class="br-desktop"> 예수·마리아·요셉의 성가정을<br class="br-mobile"> 주보로 모시는 신앙공동체입니다.<br>
+      <p class="section-desc" data-i18n-html="intro_desc">전동성당에서 분리된 서학동성당은 1968년에<br class="br-mobile"> 설립되어<br class="br-desktop"> 예수·마리아·요셉의 성가정을<br class="br-mobile"> 주보로 모시는 신앙공동체입니다.<br>
       전주 남부지역 복음화의 뿌리가 되어 온<br class="br-mobile"> 우리 서학동본당은<br class="br-desktop"> 말씀과 기도, 나눔을 통해<br class="br-mobile"> 신앙의 기쁨을 함께 나누고,<br class="br-desktop"> 세대를 이어 믿음을<br class="br-mobile"> 전하며 복음의 가치를 실천하고 있습니다.</p>
 
       <div class="intro-info-list">
         <div class="intro-info-row">
-          <span>설립</span>
-          <strong>1968년 1월 1일</strong>
+          <span data-i18n="intro_founded">설립</span>
+          <strong data-i18n="intro_founded_val">1968년 1월 1일</strong>
         </div>
         <div class="intro-info-row">
-          <span>주보성인</span>
-          <strong>예수·마리아·요셉의 성가정</strong>
-          <div class="intro-info-sub">본당의 날: 성가정 축일 · 주님 성탄 팔일 축제 중 주일</div>
+          <span data-i18n="intro_patron">주보성인</span>
+          <strong data-i18n="intro_patron_val">예수·마리아·요셉의 성가정</strong>
+          <div class="intro-info-sub" data-i18n="intro_patron_sub">본당의 날: 성가정 축일 · 주님 성탄 팔일 축제 중 주일</div>
         </div>
         <div class="intro-info-row">
-          <span>주임신부</span>
-          <strong>황의현 바오로 신부</strong>
+          <span data-i18n="intro_pastor">주임신부</span>
+          <strong data-i18n="intro_pastor_val">황의현 바오로 신부</strong>
         </div>
         <div class="intro-info-row">
-          <span>신자 수</span>
-          <strong>863세대 · 1,679명</strong>
+          <span data-i18n="intro_members">신자 수</span>
+          <strong data-i18n="intro_members_val">863세대 · 1,679명</strong>
         </div>
       </div>
     </div>
   </div>
 
   <div class="container" style="margin-top:64px;">
-    <p class="eyebrow" style="margin-bottom:16px;">역대 주임신부</p>
+    <p class="eyebrow" style="margin-bottom:16px;" data-i18n="pastors_title">역대 주임신부</p>
     <ul class="pastor-list">
       <li><div class="pastor-photo placeholder-photo"></div><span class="gen">1대</span><span class="pname">확인중</span><span class="pdate">확인중</span></li>
       <li><div class="pastor-photo placeholder-photo"></div><span class="gen">2대</span><span class="pname">확인중</span><span class="pdate">확인중</span></li>
@@ -207,13 +257,13 @@
       <li><div class="pastor-photo placeholder-photo"></div><span class="gen">17대</span><span class="pname">확인중</span><span class="pdate">확인중</span></li>
       <li><div class="pastor-photo placeholder-photo"></div><span class="gen">18대</span><span class="pname">확인중</span><span class="pdate">확인중</span></li>
       <li><div class="pastor-photo placeholder-photo"></div><span class="gen">19대</span><span class="pname">확인중</span><span class="pdate">확인중</span></li>
-      <li><div class="pastor-photo"><img src="assets/img/priest-hwang.jpg" alt="황의현 바오로 신부"></div><span class="gen">현 주임</span><span class="pname">황의현 바오로 신부</span><span class="pdate">2024.01.17 ~ 현재</span></li>
+      <li><div class="pastor-photo"><img src="assets/img/priest-hwang.jpg" alt="황의현 바오로 신부" data-i18n-alt="intro_pastor_val"></div><span class="gen">현 주임</span><span class="pname">황의현 바오로 신부</span><span class="pdate">2024.01.17 ~ 현재</span></li>
     </ul>
-    <div class="placeholder-note" style="margin-top:20px;">1968년 설립 이후 초대부터의 역대 주임신부 명단·사진·대수는 본당 확인 후 게시합니다.</div>
+    <div class="placeholder-note" style="margin-top:20px;" data-i18n="pastors_note">1968년 설립 이후 초대부터의 역대 주임신부 명단·사진·대수는 본당 확인 후 게시합니다.</div>
   </div>
 
   <div class="container" style="margin-top:56px;">
-    <p class="eyebrow" style="margin-bottom:16px;">본당 출신 신부님</p>
+    <p class="eyebrow" style="margin-bottom:16px;" data-i18n="priests_title">본당 출신 신부님</p>
     <ul class="pastor-list">
       <li><div class="pastor-photo placeholder-photo"></div><span class="gen">확인중</span><span class="pname">확인중</span><span class="pdate">확인중</span></li>
       <li><div class="pastor-photo placeholder-photo"></div><span class="gen">확인중</span><span class="pname">확인중</span><span class="pdate">확인중</span></li>
@@ -222,7 +272,7 @@
       <li><div class="pastor-photo placeholder-photo"></div><span class="gen">확인중</span><span class="pname">확인중</span><span class="pdate">확인중</span></li>
       <li><div class="pastor-photo placeholder-photo"></div><span class="gen">확인중</span><span class="pname">확인중</span><span class="pdate">확인중</span></li>
     </ul>
-    <div class="placeholder-note" style="margin-top:20px;">서학동성당 출신 사제·수도자 명단과 사진은 본당 확인 후 게시합니다.</div>
+    <div class="placeholder-note" style="margin-top:20px;" data-i18n="priests_note">서학동성당 출신 사제·수도자 명단과 사진은 본당 확인 후 게시합니다.</div>
   </div>
 </section>
 
@@ -230,8 +280,9 @@
 <section class="section" id="notice">
   <div class="container">
     <div class="section-head">
-      <h2>공지사항 · 주보</h2>
-      <p class="verse-sub">“기쁜 소식을 전하는 이들의 발이<br class="br-mobile"> 얼마나 아름다운가!”<br class="br-mobile"> <span class="verse-cite-inline">로마서 10장 15절</span></p>
+      <h2 data-i18n="notice_title">공지사항 · 주보</h2>
+      <p class="mt-note mt-note--section" data-i18n="mt_note" hidden></p>
+      <p class="verse-sub" data-i18n-html="notice_verse">“기쁜 소식을 전하는 이들의 발이<br class="br-mobile"> 얼마나 아름다운가!”<br class="br-mobile"> <span class="verse-cite-inline">로마서 10장 15절</span></p>
     </div>
 
     <!-- 아래 목록은 content/notices.json에서 자동으로 채워집니다. admin/ 관리자 페이지에서 편집하세요. -->
@@ -250,15 +301,15 @@
 <section class="section section--alt" id="gallery">
   <div class="container">
     <div class="section-head" style="max-width:900px;">
-      <h2>본당의 순간들</h2>
-      <p class="verse-sub">“보라, 형제들이 함께 어울려 사는 것이<br class="br-mobile"> 얼마나 좋고 얼마나 아름다운가!”<br class="br-mobile"> <span class="verse-cite-inline">시편 133장 1절</span></p>
+      <h2 data-i18n="gallery_title">본당의 순간들</h2>
+      <p class="verse-sub" data-i18n-html="gallery_verse">“보라, 형제들이 함께 어울려 사는 것이<br class="br-mobile"> 얼마나 좋고 얼마나 아름다운가!”<br class="br-mobile"> <span class="verse-cite-inline">시편 133장 1절</span></p>
     </div>
 
     <!-- 아래 내용은 content/gallery.json에서 자동으로 채워집니다. admin/ 관리자 페이지에서 편집하세요. -->
     <div class="gallery-year-tabs" id="galleryYearTabs"></div>
     <div class="gallery-grid" id="galleryGrid"></div>
 
-    <nav class="gallery-pagination" aria-label="갤러리 페이지"></nav>
+    <nav class="gallery-pagination" aria-label="갤러리 페이지" data-i18n-aria="gallery_pages_aria"></nav>
   </div>
 </section>
 
@@ -266,138 +317,138 @@
 <section class="section" id="location">
   <div class="container">
     <div class="section-head">
-      <h2>오시는 길</h2>
-      <p class="verse-sub">“목마른 사람은 다 나에게 와서 마셔라.” <span class="verse-cite-inline">요한복음 7장 37절</span></p>
+      <h2 data-i18n="loc_title">오시는 길</h2>
+      <p class="verse-sub" data-i18n-html="loc_verse">“목마른 사람은 다 나에게 와서 마셔라.” <span class="verse-cite-inline">요한복음 7장 37절</span></p>
     </div>
 
     <div class="loc-map" id="locMap">
       <div class="loc-map-fallback" id="locMapFallback">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s7-7.2 7-12.5A7 7 0 0 0 5 9.5C5 14.8 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
-        <p>지도를 불러오지 못했어요.<br>아래 버튼으로 위치를 확인해 주세요.</p>
-        <a href="https://map.kakao.com/link/search/전주시 완산구 서학로 51 서학동성당" target="_blank" rel="noopener" class="btn btn--outline">카카오맵에서 열기</a>
+        <p data-i18n-html="map_fail">지도를 불러오지 못했어요.<br>아래 버튼으로 위치를 확인해 주세요.</p>
+        <a href="https://map.kakao.com/link/search/전주시 완산구 서학로 51 서학동성당" target="_blank" rel="noopener" class="btn btn--outline" data-i18n="map_open_kakao">카카오맵에서 열기</a>
       </div>
     </div>
-    <p class="loc-map-caption">전주시 완산구 서학로 51 (우 55101) · 서학동성당</p>
+    <p class="loc-map-caption" data-i18n="map_caption">전주시 완산구 서학로 51 (우 55101) · 서학동성당</p>
     <div class="map-legend">
-      <span><i style="background:var(--color-wine);"></i> 서학동성당</span>
-      <span><i style="background:var(--color-sage);"></i> 전주 시내 다른 성당</span>
+      <span><i style="background:var(--color-wine);"></i> <span data-i18n="map_legend_us">서학동성당</span></span>
+      <span><i style="background:var(--color-sage);"></i> <span data-i18n="map_legend_others">전주 시내 다른 성당</span></span>
     </div>
 
     <div class="route-card">
       <div class="route-steps">
-        <span class="step">전동성당</span><span class="arrow">→</span>
-        <span class="step">전주천 · 싸전다리</span><span class="arrow">→</span>
-        <span class="step">동쪽으로 도보</span><span class="arrow">→</span>
-        <span class="step">전주교대 맞은편 서학동성당</span>
+        <span class="step" data-i18n="route_1">전동성당</span><span class="arrow">→</span>
+        <span class="step" data-i18n="route_2">전주천 · 싸전다리</span><span class="arrow">→</span>
+        <span class="step" data-i18n="route_3">동쪽으로 도보</span><span class="arrow">→</span>
+        <span class="step" data-i18n="route_4">전주교대 맞은편 서학동성당</span>
       </div>
       <div class="stat-strip">
-        <div><strong>약 0.8km</strong></div>
-        <div><strong>도보 12분</strong></div>
+        <div><strong data-i18n="route_dist">약 0.8km</strong></div>
+        <div><strong data-i18n="route_time">도보 12분</strong></div>
       </div>
     </div>
 
     <ul class="contact-list contact-list--row">
       <li>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s7-7.2 7-12.5A7 7 0 0 0 5 9.5C5 14.8 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
-        <div><span class="label">주소</span><span class="value">서학로 51 (우 55101)</span></div>
+        <div><span class="label" data-i18n="contact_address">주소</span><span class="value" data-i18n="contact_address_val">서학로 51 (우 55101)</span></div>
       </li>
       <li>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h4l2 5-2.5 1.5a12 12 0 0 0 6 6L15 15l5 2v4a2 2 0 0 1-2 2C9.5 23 1 14.5 1 5a2 2 0 0 1 2-2Z"/></svg>
-        <div><span class="label">사무실</span><span class="value">063-286-4929</span></div>
+        <div><span class="label" data-i18n="contact_office">사무실</span><span class="value">063-286-4929</span></div>
       </li>
       <li>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h4l2 5-2.5 1.5a12 12 0 0 0 6 6L15 15l5 2v4a2 2 0 0 1-2 2C9.5 23 1 14.5 1 5a2 2 0 0 1 2-2Z"/></svg>
-        <div><span class="label">사제관</span><span class="value">063-284-8307</span></div>
+        <div><span class="label" data-i18n="contact_rectory">사제관</span><span class="value">063-284-8307</span></div>
       </li>
       <li>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h4l2 5-2.5 1.5a12 12 0 0 0 6 6L15 15l5 2v4a2 2 0 0 1-2 2C9.5 23 1 14.5 1 5a2 2 0 0 1 2-2Z"/></svg>
-        <div><span class="label">수녀원</span><span class="value">063-284-2276</span></div>
+        <div><span class="label" data-i18n="contact_convent">수녀원</span><span class="value">063-284-2276</span></div>
       </li>
       <li>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg>
-        <div><span class="label">팩스</span><span class="value">063-232-9009</span></div>
+        <div><span class="label" data-i18n="contact_fax">팩스</span><span class="value">063-232-9009</span></div>
       </li>
     </ul>
   </div>
 </section>
 
 <!-- 관리자 진입: 아래 작은 글자는 누구나 보이지만, "관리" 버튼은 구글 로그인한 관리자에게만 나타난다 -->
-<p class="admin-entry"><a href="admin/">관리자</a></p>
+<p class="admin-entry"><a href="admin/" data-i18n="admin_entry">관리자</a></p>
 
 <a href="admin/" class="admin-fab" id="adminFab" hidden>✏️ 관리</a>
 
 <div class="lightbox" id="lightbox">
   <div class="lightbox-inner">
-    <div class="lightbox-img placeholder-photo" id="lightboxImg">사진 준비중</div>
+    <div class="lightbox-img placeholder-photo" id="lightboxImg" data-i18n="photo_preparing">사진 준비중</div>
     <div class="lightbox-cap">
       <span id="lightboxCap"></span>
-      <button class="lightbox-close" id="lightboxClose" aria-label="닫기">✕</button>
+      <button class="lightbox-close" id="lightboxClose" aria-label="닫기" data-i18n-aria="close">✕</button>
     </div>
   </div>
 </div>
 
 <button type="button" class="install-fab" id="installAppBtn">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v13m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-  홈 화면에 추가
+  <span data-i18n="install_btn">홈 화면에 추가</span>
 </button>
 
 <div class="install-modal" id="installModal">
   <div class="install-modal-inner">
     <div class="install-modal-head">
-      <strong>홈 화면에 추가하기</strong>
-      <button class="lightbox-close" id="installModalClose" aria-label="닫기">✕</button>
+      <strong data-i18n="install_title">홈 화면에 추가하기</strong>
+      <button class="lightbox-close" id="installModalClose" aria-label="닫기" data-i18n-aria="close">✕</button>
     </div>
     <div id="installGuideIOS" hidden>
-      <p class="install-guide-lead">아이폰(사파리)에서는 이렇게 해보세요.</p>
+      <p class="install-guide-lead" data-i18n="install_ios_lead">아이폰(사파리)에서는 이렇게 해보세요.</p>
       <ol class="install-steps">
-        <li><span class="install-step-num">1</span><span>화면 아래쪽의 <strong>공유 버튼</strong>(네모에서 위로 화살표 나가는 모양)을 눌러주세요.</span></li>
-        <li><span class="install-step-num">2</span><span>아래로 내려서 <strong>"홈 화면에 추가"</strong>를 찾아 눌러주세요.</span></li>
-        <li><span class="install-step-num">3</span><span>오른쪽 위 <strong>"추가"</strong>를 누르면 끝이에요.</span></li>
+        <li><span class="install-step-num">1</span><span data-i18n-html="install_ios_1">화면 아래쪽의 <strong>공유 버튼</strong>(네모에서 위로 화살표 나가는 모양)을 눌러주세요.</span></li>
+        <li><span class="install-step-num">2</span><span data-i18n-html="install_ios_2">아래로 내려서 <strong>"홈 화면에 추가"</strong>를 찾아 눌러주세요.</span></li>
+        <li><span class="install-step-num">3</span><span data-i18n-html="install_ios_3">오른쪽 위 <strong>"추가"</strong>를 누르면 끝이에요.</span></li>
       </ol>
     </div>
     <div id="installGuideAndroid" hidden>
-      <p class="install-guide-lead">안드로이드에서는 이렇게 해보세요.</p>
+      <p class="install-guide-lead" data-i18n="install_android_lead">안드로이드에서는 이렇게 해보세요.</p>
       <ol class="install-steps">
-        <li><span class="install-step-num">1</span><span>화면 위쪽이나 아래쪽에 있는 <strong>점 3개(⋮) 또는 줄 3개(≡) 메뉴 버튼</strong>을 찾아 눌러주세요.</span></li>
-        <li><span class="install-step-num">2</span><span>메뉴 목록에서 <strong>"홈 화면에 추가"</strong> 또는 <strong>"앱 설치"</strong>라고 쓰인 것을 찾아 눌러주세요.</span></li>
-        <li><span class="install-step-num">3</span><span><strong>"추가"</strong>를 누르면 끝이에요.</span></li>
+        <li><span class="install-step-num">1</span><span data-i18n-html="install_android_1">화면 위쪽이나 아래쪽에 있는 <strong>점 3개(⋮) 또는 줄 3개(≡) 메뉴 버튼</strong>을 찾아 눌러주세요.</span></li>
+        <li><span class="install-step-num">2</span><span data-i18n-html="install_android_2">메뉴 목록에서 <strong>"홈 화면에 추가"</strong> 또는 <strong>"앱 설치"</strong>라고 쓰인 것을 찾아 눌러주세요.</span></li>
+        <li><span class="install-step-num">3</span><span data-i18n-html="install_android_3"><strong>"추가"</strong>를 누르면 끝이에요.</span></li>
       </ol>
     </div>
     <div id="installGuideInApp" hidden>
-      <p class="install-guide-lead">카카오톡 화면 안에서는 설치가 안 돼요. 이렇게 해보세요.</p>
+      <p class="install-guide-lead" data-i18n="install_inapp_lead">카카오톡 화면 안에서는 설치가 안 돼요. 이렇게 해보세요.</p>
       <ol class="install-steps">
-        <li><span class="install-step-num">1</span><span><strong>뒤로 가기</strong>를 눌러 대화방(채팅방)으로 돌아가주세요.</span></li>
-        <li><span class="install-step-num">2</span><span>이 링크(주소)를 손가락으로 <strong>길게(꾹) 눌러주세요</strong>.</span></li>
-        <li><span class="install-step-num">3</span><span>나오는 메뉴에서 <strong>"다른 브라우저로 열기"</strong>(또는 "Chrome으로 열기")를 눌러주세요.</span></li>
-        <li><span class="install-step-num">4</span><span>새로 열린 화면에서 이 버튼을 다시 한 번 눌러주세요.</span></li>
+        <li><span class="install-step-num">1</span><span data-i18n-html="install_inapp_1"><strong>뒤로 가기</strong>를 눌러 대화방(채팅방)으로 돌아가주세요.</span></li>
+        <li><span class="install-step-num">2</span><span data-i18n-html="install_inapp_2">이 링크(주소)를 손가락으로 <strong>길게(꾹) 눌러주세요</strong>.</span></li>
+        <li><span class="install-step-num">3</span><span data-i18n-html="install_inapp_3">나오는 메뉴에서 <strong>"다른 브라우저로 열기"</strong>(또는 "Chrome으로 열기")를 눌러주세요.</span></li>
+        <li><span class="install-step-num">4</span><span data-i18n="install_inapp_4">새로 열린 화면에서 이 버튼을 다시 한 번 눌러주세요.</span></li>
       </ol>
     </div>
     <div id="installGuideGeneric" hidden>
-      <p class="install-guide-lead">컴퓨터에서는 이렇게 해보세요.</p>
+      <p class="install-guide-lead" data-i18n="install_pc_lead">컴퓨터에서는 이렇게 해보세요.</p>
       <ol class="install-steps">
-        <li><span class="install-step-num">1</span><span>주소창 오른쪽 끝의 <strong>설치 아이콘</strong>(모니터에 ↓ 모양)을 눌러주세요.</span></li>
-        <li><span class="install-step-num">2</span><span><strong>"설치"</strong>를 누르면 끝이에요.</span></li>
+        <li><span class="install-step-num">1</span><span data-i18n-html="install_pc_1">주소창 오른쪽 끝의 <strong>설치 아이콘</strong>(모니터에 ↓ 모양)을 눌러주세요.</span></li>
+        <li><span class="install-step-num">2</span><span data-i18n-html="install_pc_2"><strong>"설치"</strong>를 누르면 끝이에요.</span></li>
       </ol>
-      <p class="install-guide-note" style="border-top:none;padding-top:0;">설치 아이콘이 안 보이면 이미 설치된 거예요. 작업표시줄이나 시작 메뉴의 <strong>서학동성당</strong> 아이콘으로 여세요.</p>
+      <p class="install-guide-note" style="border-top:none;padding-top:0;" data-i18n-html="install_pc_note">설치 아이콘이 안 보이면 이미 설치된 거예요. 작업표시줄이나 시작 메뉴의 <strong>서학동성당</strong> 아이콘으로 여세요.</p>
     </div>
-    <p class="install-guide-note">한 번만 추가해두면, 다음부터는 휴대폰 화면의 아이콘을 눌러 앱처럼 바로 들어올 수 있어요.</p>
+    <p class="install-guide-note" data-i18n="install_note">한 번만 추가해두면, 다음부터는 휴대폰 화면의 아이콘을 눌러 앱처럼 바로 들어올 수 있어요.</p>
   </div>
 </div>
 
 <div class="install-modal" id="notifPanel">
   <div class="install-modal-inner">
     <div class="install-modal-head">
-      <strong>알림함</strong>
-      <button class="lightbox-close" id="notifPanelClose" aria-label="닫기">✕</button>
+      <strong data-i18n="notif_title">알림함</strong>
+      <button class="lightbox-close" id="notifPanelClose" aria-label="닫기" data-i18n-aria="close">✕</button>
     </div>
     <div class="push-toggle-row">
       <button type="button" class="push-toggle-btn" id="pushAppBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span id="pushAppBtnLabel">알림 받기</span>
+        <span id="pushAppBtnLabel" data-i18n="push_on">알림 받기</span>
       </button>
     </div>
     <ul class="notif-list" id="notifList"></ul>
-    <p class="install-guide-note" id="notifEmpty">아직 온 알림이 없어요.</p>
+    <p class="install-guide-note" id="notifEmpty" data-i18n="notif_empty">아직 온 알림이 없어요.</p>
   </div>
 </div>
 
@@ -405,29 +456,29 @@
 <div class="install-modal" id="pushModal">
   <div class="install-modal-inner">
     <div class="install-modal-head">
-      <strong>성당 알림 받기</strong>
-      <button class="lightbox-close" id="pushModalClose" aria-label="닫기">✕</button>
+      <strong data-i18n="push_modal_title">성당 알림 받기</strong>
+      <button class="lightbox-close" id="pushModalClose" aria-label="닫기" data-i18n-aria="close">✕</button>
     </div>
     <div id="pushGuideIOS" hidden>
-      <p class="install-guide-lead">아이폰에서는 먼저 홈 화면에 추가해야 알림을 받을 수 있어요.</p>
+      <p class="install-guide-lead" data-i18n="push_ios_lead">아이폰에서는 먼저 홈 화면에 추가해야 알림을 받을 수 있어요.</p>
       <ol class="install-steps">
-        <li><span class="install-step-num">1</span><span>이 창을 닫고 <strong>"홈 화면에 추가"</strong> 버튼을 먼저 눌러주세요.</span></li>
-        <li><span class="install-step-num">2</span><span>홈 화면에 추가된 아이콘으로 다시 들어와 <strong>"알림 받기"</strong>를 눌러주세요.</span></li>
+        <li><span class="install-step-num">1</span><span data-i18n-html="push_ios_1">이 창을 닫고 <strong>"홈 화면에 추가"</strong> 버튼을 먼저 눌러주세요.</span></li>
+        <li><span class="install-step-num">2</span><span data-i18n-html="push_ios_2">홈 화면에 추가된 아이콘으로 다시 들어와 <strong>"알림 받기"</strong>를 눌러주세요.</span></li>
       </ol>
     </div>
     <div id="pushGuideDenied" hidden>
-      <p class="install-guide-lead">알림이 차단되어 있어요. 브라우저 설정에서 다시 켜주세요.</p>
+      <p class="install-guide-lead" data-i18n="push_denied_lead">알림이 차단되어 있어요. 브라우저 설정에서 다시 켜주세요.</p>
       <ol class="install-steps">
-        <li><span class="install-step-num">1</span><span>주소창 왼쪽의 <strong>자물쇠 아이콘</strong>(또는 브라우저 설정)을 눌러주세요.</span></li>
-        <li><span class="install-step-num">2</span><span><strong>"알림"</strong> 항목을 찾아 <strong>허용</strong>으로 바꿔주세요.</span></li>
-        <li><span class="install-step-num">3</span><span>이 페이지를 새로고침한 뒤 다시 눌러주세요.</span></li>
+        <li><span class="install-step-num">1</span><span data-i18n-html="push_denied_1">주소창 왼쪽의 <strong>자물쇠 아이콘</strong>(또는 브라우저 설정)을 눌러주세요.</span></li>
+        <li><span class="install-step-num">2</span><span data-i18n-html="push_denied_2"><strong>"알림"</strong> 항목을 찾아 <strong>허용</strong>으로 바꿔주세요.</span></li>
+        <li><span class="install-step-num">3</span><span data-i18n="push_denied_3">이 페이지를 새로고침한 뒤 다시 눌러주세요.</span></li>
       </ol>
     </div>
     <div id="pushGuideInApp" hidden>
-      <p class="install-guide-lead">카카오톡 화면 안에서는 알림을 켤 수 없어요.</p>
-      <p class="install-guide-note" style="border-top:none;padding-top:0;">화면 오른쪽 위 메뉴에서 <strong>"다른 브라우저로 열기"</strong>를 눌러 연 뒤, 그 화면에서 다시 눌러주세요.</p>
+      <p class="install-guide-lead" data-i18n="push_inapp_lead">카카오톡 화면 안에서는 알림을 켤 수 없어요.</p>
+      <p class="install-guide-note" style="border-top:none;padding-top:0;" data-i18n-html="push_inapp_note">화면 오른쪽 위 메뉴에서 <strong>"다른 브라우저로 열기"</strong>를 눌러 연 뒤, 그 화면에서 다시 눌러주세요.</p>
     </div>
-    <p class="install-guide-note">전달사항이 있을 때만 성당에서 알림을 보내드려요. 알림함(종 버튼)에서 언제든 켜고 끌 수 있어요.</p>
+    <p class="install-guide-note" data-i18n="push_modal_note">전달사항이 있을 때만 성당에서 알림을 보내드려요. 알림함(종 버튼)에서 언제든 켜고 끌 수 있어요.</p>
   </div>
 </div>
 
@@ -437,14 +488,14 @@
   <div class="install-modal-inner">
     <div class="install-modal-head">
       <strong id="announceModalTitle">테스트 팝업</strong>
-      <button class="lightbox-close" id="announceModalCloseBtn" aria-label="닫기">✕</button>
+      <button class="lightbox-close" id="announceModalCloseBtn" aria-label="닫기" data-i18n-aria="close">✕</button>
     </div>
     <img src="assets/img/church-exterior.jpg" alt="" class="announce-modal-img" id="announceModalImg">
     <p class="announce-modal-text" id="announceModalText">팝업창 기능 테스트입니다.
 실제로 쓰실 때는 이 제목/본문/이미지를 공지 내용으로 바꿔주세요.</p>
     <label class="announce-modal-hide">
       <input type="checkbox" id="announceModalHideToday">
-      오늘 하루 보지 않기
+      <span data-i18n="announce_hide_today">오늘 하루 보지 않기</span>
     </label>
   </div>
 </div>
@@ -453,13 +504,13 @@
 <div class="install-modal" id="pushOptInModal">
   <div class="install-modal-inner">
     <div class="install-modal-head">
-      <strong>알림을 받으시겠어요?</strong>
-      <button class="lightbox-close" id="pushOptInClose" aria-label="닫기">✕</button>
+      <strong data-i18n="optin_title">알림을 받으시겠어요?</strong>
+      <button class="lightbox-close" id="pushOptInClose" aria-label="닫기" data-i18n-aria="close">✕</button>
     </div>
-    <p class="install-guide-lead">공지사항이 올라오면 휴대폰으로 바로 알려드려요. 나중에 알림함에서 언제든 켜고 끌 수 있어요.</p>
+    <p class="install-guide-lead" data-i18n="optin_lead">공지사항이 올라오면 휴대폰으로 바로 알려드려요. 나중에 알림함에서 언제든 켜고 끌 수 있어요.</p>
     <div class="push-optin-actions">
-      <button type="button" class="btn btn--primary" id="pushOptInYes">네, 받을게요</button>
-      <button type="button" class="btn btn--outline" id="pushOptInNo">괜찮아요</button>
+      <button type="button" class="btn btn--primary" id="pushOptInYes" data-i18n="optin_yes">네, 받을게요</button>
+      <button type="button" class="btn btn--outline" id="pushOptInNo" data-i18n="optin_no">괜찮아요</button>
     </div>
   </div>
 </div>
@@ -470,11 +521,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="assets/js/push-config.js?v=202609150"></script>
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=cbcb370204a8f8c4a89fb47c6e001a5f&libraries=services&autoload=false"></script>
-<script src="assets/js/todayword.js?v=202609121"></script>
-<script src="assets/js/main.js?v=202609152"></script>
-<script src="assets/js/announce-modal.js?v=202609260"></script>
-<script src="assets/js/push.js?v=202609260"></script>
-<script src="assets/js/notif-inbox.js?v=202609098"></script>
+<script src="assets/js/i18n.js?v=202609261"></script>
+<script src="assets/js/todayword.js?v=202609261"></script>
+<script src="assets/js/main.js?v=202609261"></script>
+<script src="assets/js/announce-modal.js?v=202609261"></script>
+<script src="assets/js/push.js?v=202609261"></script>
+<script src="assets/js/notif-inbox.js?v=202609261"></script>
 <!-- 구글 로그인한 관리자에게만 "관리" 버튼을 보여준다 (admin/ 관리자 페이지로 연결) -->
 <script src="assets/js/admin-link.js?v=202609150"></script>
 <script>
