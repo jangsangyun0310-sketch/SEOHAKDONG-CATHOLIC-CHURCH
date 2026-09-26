@@ -97,7 +97,7 @@
 - [x] GitHub 토큰(`GITHUB_TOKEN`, 이 저장소 Contents 읽기/쓰기만) 만들어 Worker 비밀값에 넣기 — 2026-09-26 사용자와 함께 완료
 - [x] Workers 자동 배포 연결 (Settings → Build → Connect, main 브랜치, Deploy command `npx wrangler deploy`) — 2026-09-26 완료. D1 표 구조 변경(migrations)은 자동 배포에 포함되지 않으므로 `npm run db:migrate:remote`로 따로 적용
 - [x] 지도: 카카오 지도 API가 서학동에서는 결제를 요구해(용머리성당에서 먼저 사용 중) **구글 지도 퍼가기(키·결제 없음)**로 교체 — 2026-09-26
-- [ ] 예전 Cloudflare Pages 프로젝트(`seohakdong-catholic-church.pages.dev`) 삭제 여부 결정 — 이번 구조 변경 뒤로는 예전 주소가 제대로 안 뜸. 삭제 시 그 안의 예전 GitHub 토큰(classic, repo 전체 권한)도 GitHub에서 폐기 권장
+- [x] 예전 Cloudflare Pages 프로젝트(`seohakdong-catholic-church.pages.dev`) 삭제 — 2026-09-26 (배포 103개 정리 후 삭제). Firebase 승인 도메인에서도 예전 주소 제거(주소를 남이 가져가 가짜 로그인 화면에 쓰는 것 방지). 예전 GitHub classic 토큰 `seohakdong admin`은 사용자가 GitHub 화면에서 삭제
 - [ ] 쓰지 않게 된 것 정리 여부: GitHub Actions 비밀값 `FIREBASE_SERVICE_ACCOUNT`, Firebase의 Firestore 데이터(모두 D1로 옮김)
 - [ ] 같은 구조로 용머리성당(project) 이전 → 해월피정의집·samudaejeon 공통 부분(구글 로그인·주간 D1 백업) 맞추기
 - [ ] D1 주간 자동 백업(비공개 저장소) 추가
