@@ -30,7 +30,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
-<link rel="stylesheet" href="assets/css/style.css?v=202609265">
+<link rel="stylesheet" href="assets/css/style.css?v=202609271">
 <!-- 외국어로 볼지 먼저 정한다 (주소의 ?lang=en > 전에 고른 언어 > 휴대폰 언어 설정).
      한국어가 아니면 번역이 끝날 때까지 잠깐 화면을 가려서 한국어가 번쩍 보이지 않게 한다. -->
 <script>
@@ -320,17 +320,16 @@
       <p class="verse-sub" data-i18n-html="loc_verse">“목마른 사람은 다 나에게 와서 마셔라.” <span class="verse-cite-inline">요한복음 7장 37절</span></p>
     </div>
 
+    <!-- 구글 지도 퍼가기 (API 키·결제 없이 무료). 화면 언어에 맞춰 main.js가 주소를 넣는다 -->
     <div class="loc-map" id="locMap">
-      <div class="loc-map-fallback" id="locMapFallback">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s7-7.2 7-12.5A7 7 0 0 0 5 9.5C5 14.8 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.4"/></svg>
-        <p data-i18n-html="map_fail">지도를 불러오지 못했어요.<br>아래 버튼으로 위치를 확인해 주세요.</p>
-        <a href="https://map.kakao.com/link/search/전주시 완산구 서학로 51 서학동성당" target="_blank" rel="noopener" class="btn btn--outline" data-i18n="map_open_kakao">카카오맵에서 열기</a>
-      </div>
+      <iframe id="locMapFrame" class="loc-map-frame" title="서학동성당 위치 지도" data-i18n-title="map_iframe_title" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
     </div>
     <p class="loc-map-caption" data-i18n="map_caption">전주시 완산구 서학로 51 (우 55101) · 서학동성당</p>
-    <div class="map-legend">
-      <span><i style="background:var(--color-wine);"></i> <span data-i18n="map_legend_us">서학동성당</span></span>
-      <span><i style="background:var(--color-sage);"></i> <span data-i18n="map_legend_others">전주 시내 다른 성당</span></span>
+    <!-- 익숙한 지도 앱으로 바로 열어 길찾기 (링크라서 키·결제 필요 없음) -->
+    <div class="map-links">
+      <a class="map-link" href="https://map.naver.com/p/search/%EC%A0%84%EC%A3%BC%20%EC%84%9C%ED%95%99%EB%8F%99%EC%84%B1%EB%8B%B9" target="_blank" rel="noopener" data-i18n="map_open_naver">네이버 지도에서 열기</a>
+      <a class="map-link" href="https://map.kakao.com/link/search/%EC%A0%84%EC%A3%BC%20%EC%84%9C%ED%95%99%EB%8F%99%EC%84%B1%EB%8B%B9" target="_blank" rel="noopener" data-i18n="map_open_kakao">카카오맵에서 열기</a>
+      <a class="map-link" href="https://www.google.com/maps/search/?api=1&amp;query=%EC%B2%9C%EC%A3%BC%EA%B5%90%20%EC%84%9C%ED%95%99%EB%8F%99%EC%84%B1%EB%8B%B9" target="_blank" rel="noopener" data-i18n="map_open_google">구글 지도에서 열기</a>
     </div>
 
     <div class="route-card">
@@ -520,10 +519,9 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="assets/js/push-config.js?v=202609270"></script>
-<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=cbcb370204a8f8c4a89fb47c6e001a5f&libraries=services&autoload=false"></script>
-<script src="assets/js/i18n.js?v=202609265"></script>
+<script src="assets/js/i18n.js?v=202609271"></script>
 <script src="assets/js/todayword.js?v=202609270"></script>
-<script src="assets/js/main.js?v=202609270"></script>
+<script src="assets/js/main.js?v=202609271"></script>
 <script src="assets/js/announce-modal.js?v=202609270"></script>
 <script src="assets/js/push.js?v=202609270"></script>
 <script src="assets/js/notif-inbox.js?v=202609270"></script>

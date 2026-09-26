@@ -453,22 +453,11 @@ document.addEventListener("DOMContentLoaded", () => {
       .catch(() => {});
   })();
 
-  // 카카오맵 — 오시는 길
-  const mapEl = document.getElementById("locMap");
-  if (mapEl && window.kakao && window.kakao.maps) {
-    kakao.maps.load(() => {
-      const geocoder = new kakao.maps.services.Geocoder();
-      const address = "전주시 완산구 서학로 51";
-      geocoder.addressSearch(address, (result, status) => {
-        const center =
-          status === kakao.maps.services.Status.OK
-            ? new kakao.maps.LatLng(result[0].y, result[0].x)
-            : new kakao.maps.LatLng(35.8074, 127.1489); // 주소 검색 실패 시 대략적 위치로 대체
-
-        mapEl.innerHTML = ""; // 지도가 정상 로드되면 안내 문구(fallback)를 지운다
-        const map = new kakao.maps.Map(mapEl, { center, level: 4 });
-        new kakao.maps.Marker({ map, position: center, title: "서학동성당" });
-      });
-    });
+  // 오시는 길 — 구글 지도 퍼가기 (키·결제 없이 무료). 지도 글자를 화면 언어에 맞춘다.
+  // "천주교 서학동성당"으로 찾으면 구글에 등록된 성당 위치(서학로 51)가 정확히 나온다.
+  const mapFrame = document.getElementById("locMapFrame");
+  if (mapFrame) {
+    const hl = { ko: "ko", en: "en", ja: "ja", zh: "zh-CN" }[I18N.lang] || "ko";
+    mapFrame.src = `https://www.google.com/maps?q=${encodeURIComponent("천주교 서학동성당")}&z=16&output=embed&hl=${hl}`;
   }
 });
