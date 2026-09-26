@@ -30,7 +30,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
-<link rel="stylesheet" href="assets/css/style.css?v=202609261">
+<link rel="stylesheet" href="assets/css/style.css?v=202609265">
 <!-- 외국어로 볼지 먼저 정한다 (주소의 ?lang=en > 전에 고른 언어 > 휴대폰 언어 설정).
      한국어가 아니면 번역이 끝날 때까지 잠깐 화면을 가려서 한국어가 번쩍 보이지 않게 한다. -->
 <script>
@@ -75,7 +75,6 @@
               <button type="button" role="menuitem" data-lang="en">English</button>
               <button type="button" role="menuitem" data-lang="ja">日本語</button>
               <button type="button" role="menuitem" data-lang="zh">中文</button>
-              <p class="mt-note" data-i18n="mt_note" hidden></p>
             </div>
           </div>
           <button type="button" class="notif-bell notif-bell--desktop" id="notifBellBtnDesktop" aria-label="알림함 열기" data-i18n-aria="bell_open">
@@ -110,7 +109,6 @@
           <button type="button" role="menuitem" data-lang="en">English</button>
           <button type="button" role="menuitem" data-lang="ja">日本語</button>
           <button type="button" role="menuitem" data-lang="zh">中文</button>
-          <p class="mt-note" data-i18n="mt_note" hidden></p>
         </div>
       </div>
       <button type="button" class="notif-bell notif-bell--mobile" id="notifBellBtnMobile" aria-label="알림함 열기" data-i18n-aria="bell_open">
@@ -184,10 +182,11 @@
           <div><span data-i18n="day_thu">목</span><strong>19:00</strong></div>
           <div><span data-i18n="day_fri">금</span><strong>10:00</strong></div>
         </div>
+        <p class="i18n-only i18n-note hero-mass-note" data-i18n-html="mass_change_note" hidden></p>
       </div>
       <div class="hero-mass-contact">
         <span>📞 063-286-4929</span>
-        <span data-i18n="address_short">⛪ 전주시 완산구 서학로 51 (우 55101)</span>
+        <span data-i18n-html="address_short">⛪ 전주시 완산구 서학로 51 (우 55101)</span>
       </div>
     </div>
   </div>
@@ -281,7 +280,7 @@
   <div class="container">
     <div class="section-head">
       <h2 data-i18n="notice_title">공지사항 · 주보</h2>
-      <p class="mt-note mt-note--section" data-i18n="mt_note" hidden></p>
+      <p class="i18n-only i18n-note" data-i18n="korean_only_note" hidden></p>
       <p class="verse-sub" data-i18n-html="notice_verse">“기쁜 소식을 전하는 이들의 발이<br class="br-mobile"> 얼마나 아름다운가!”<br class="br-mobile"> <span class="verse-cite-inline">로마서 10장 15절</span></p>
     </div>
 
@@ -521,12 +520,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="assets/js/push-config.js?v=202609150"></script>
 <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=cbcb370204a8f8c4a89fb47c6e001a5f&libraries=services&autoload=false"></script>
-<script src="assets/js/i18n.js?v=202609261"></script>
-<script src="assets/js/todayword.js?v=202609261"></script>
-<script src="assets/js/main.js?v=202609261"></script>
-<script src="assets/js/announce-modal.js?v=202609261"></script>
-<script src="assets/js/push.js?v=202609261"></script>
-<script src="assets/js/notif-inbox.js?v=202609261"></script>
+<script src="assets/js/i18n.js?v=202609265"></script>
+<script src="assets/js/todayword.js?v=202609265"></script>
+<script src="assets/js/main.js?v=202609265"></script>
+<script src="assets/js/announce-modal.js?v=202609265"></script>
+<script src="assets/js/push.js?v=202609265"></script>
+<script src="assets/js/notif-inbox.js?v=202609265"></script>
 <!-- 구글 로그인한 관리자에게만 "관리" 버튼을 보여준다 (admin/ 관리자 페이지로 연결) -->
 <script src="assets/js/admin-link.js?v=202609150"></script>
 <script>

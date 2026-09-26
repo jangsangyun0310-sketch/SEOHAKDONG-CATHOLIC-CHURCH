@@ -15,9 +15,7 @@ window.__announceReady = (function () {
       const textEl = document.getElementById('announceModalText');
       const imgEl = document.getElementById('announceModalImg');
       if (titleEl) titleEl.textContent = data.title || '';
-      if (textEl) textEl.textContent = data.text || '';
-      if (window.I18N) I18N.translateElements([titleEl, textEl]);
-      if (imgEl) {
+      if (textEl) textEl.textContent = data.text || '';      if (imgEl) {
         if (data.image) {
           imgEl.src = data.image;
           imgEl.style.display = '';

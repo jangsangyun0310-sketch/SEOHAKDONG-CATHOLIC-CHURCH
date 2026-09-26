@@ -29,8 +29,6 @@
         // 색 모양(CSS)은 한국어 값(백/홍/녹/자/흑)을 기준으로 하므로 data-color는 그대로 두고 글자만 바꾼다
         colorEl.dataset.color = d.color;
         colorEl.textContent = window.I18N ? I18N.t('color_' + d.color, d.color) : d.color;
-      }
-      if (window.I18N) I18N.translateElements([document.getElementById('liturgyFeast'), document.getElementById('liturgyVerse')]);
-    })
+      }    })
     .catch((err) => console.error('오늘의 말씀 불러오기 실패', err));
 })();

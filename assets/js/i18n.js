@@ -1,6 +1,6 @@
-// 외국인 방문객용 다국어 보기 (한국어 / English / 日本語 / 中文)
-// - 메뉴·소개·미사시간·오시는 길 같은 고정 문구: 아래 사전(D)에 직접 번역해 둔 문장으로 바꾼다.
-// - 공지·주보·갤러리·팝업·알림함·오늘의 말씀처럼 관리자가 올리는 내용: /api/translate(자동 번역)로 바꾼다.
+// 외국인 방문객(주로 관광객)용 다국어 보기 (한국어 / English / 日本語 / 中文)
+// 관광객이 주로 보는 미사시간·본당 소개·오시는 길 같은 고정 문구만 아래 사전(D)의 직접 번역으로 바꾼다.
+// 공지·주보·갤러리·알림처럼 관리자가 올리는 내용은 번역하지 않고 한국어로 둔다.
 // 어떤 언어로 볼지는 index.html <head>의 짧은 스크립트가 먼저 정해 window.__LANG에 넣어둔다.
 (function () {
   const LANGS = ['ko', 'en', 'ja', 'zh'];
@@ -13,9 +13,17 @@
   const D = {
     page_title: ['Seohakdong Catholic Church | Diocese of Jeonju', '西鶴洞聖堂 | カトリック全州教区', '西鹤洞天主堂 | 天主教全州教区'],
 
-    // 언어 메뉴
-    lang_button: ['Language', '言語', '语言'],
-    mt_note: ['Notices, photos and alerts are machine-translated.', 'お知らせ・写真・通知は機械翻訳です。', '公告、照片和通知为机器翻译。'],
+    // 외국어 화면에만 보이는 안내
+    korean_only_note: [
+      'Notices, bulletins and photos are posted in Korean only.',
+      'お知らせ・週報・写真は韓国語のみで掲載しています。',
+      '公告、周报和照片仅以韩语发布。',
+    ],
+    mass_change_note: [
+      'Mass times may change. Please call the parish office (<span class="nowrap">+82-63-286-4929</span>) to confirm.',
+      'ミサの時間は変更になる場合があります。事務室（<span class="nowrap">+82-63-286-4929</span>）にお電話でご確認ください。',
+      '弥撒时间可能会有变动，请致电堂区办公室（<span class="nowrap">+82-63-286-4929</span>）确认。',
+    ],
 
     // 헤더
     brand_reload: ['Reload the homepage', 'ホームページを再読み込み', '刷新首页'],
@@ -74,9 +82,9 @@
     day_thu: ['Thu', '木', '周四'],
     day_fri: ['Fri', '金', '周五'],
     address_short: [
-      '⛪ 51 Seohak-ro, Wansan-gu, Jeonju (전주시 완산구 서학로 51)',
-      '⛪ 全州市 完山区 ソハク路 51（전주시 완산구 서학로 51）',
-      '⛪ 全州市 完山区 西鹤路 51（전주시 완산구 서학로 51）',
+      '⛪ 51 Seohak-ro, Wansan-gu, Jeonju <span class="nowrap">(전주시 완산구 서학로 51)</span>',
+      '⛪ 全州市 完山区 ソハク路 51<span class="nowrap">（전주시 완산구 서학로 51）</span>',
+      '⛪ 全州市 完山区 西鹤路 51<span class="nowrap">（전주시 완산구 서학로 51）</span>',
     ],
 
     // 본당 소개
@@ -376,81 +384,6 @@
     document.title = t('page_title', document.title);
   }
 
-  // ---------- 자동 번역 (관리자가 올리는 내용) ----------
-  const HANGUL = /[가-힣]/;
-  const MT_CACHE_KEY = 'seohakdong-mt-' + lang;
-  const MT_CACHE_MAX = 800;
-  let mtCache = {};
-  try { mtCache = JSON.parse(localStorage.getItem(MT_CACHE_KEY) || '{}') || {}; } catch (e) { mtCache = {}; }
-  function saveCache() {
-    try {
-      const keys = Object.keys(mtCache);
-      if (keys.length > MT_CACHE_MAX) keys.slice(0, keys.length - MT_CACHE_MAX).forEach((k) => delete mtCache[k]);
-      localStorage.setItem(MT_CACHE_KEY, JSON.stringify(mtCache));
-    } catch (e) { /* 저장 공간이 없어도 번역 자체는 계속 동작 */ }
-  }
-
-  // 같은 순간에 요청된 문장들을 모아 한 번에 보낸다
-  let queue = new Map(); // text -> [resolve...]
-  let flushTimer = null;
-  function requestLine(line) {
-    if (!HANGUL.test(line)) return Promise.resolve(line);
-    if (mtCache[line] != null) return Promise.resolve(mtCache[line]);
-    return new Promise((resolve) => {
-      if (!queue.has(line)) queue.set(line, []);
-      queue.get(line).push(resolve);
-      if (!flushTimer) flushTimer = setTimeout(flush, 0);
-    });
-  }
-  async function flush() {
-    flushTimer = null;
-    const pending = queue;
-    queue = new Map();
-    const texts = [...pending.keys()];
-    for (let i = 0; i < texts.length; i += 40) {
-      const chunk = texts.slice(i, i + 40);
-      let out = chunk;
-      try {
-        const res = await fetch('/api/translate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ target: lang, texts: chunk }),
-        });
-        const data = res.ok ? await res.json() : null;
-        if (data && data.translated && Array.isArray(data.texts) && data.texts.length === chunk.length) {
-          out = data.texts;
-          chunk.forEach((src, j) => { if (out[j] && out[j] !== src) mtCache[src] = out[j]; });
-          saveCache();
-        }
-      } catch (e) { /* 번역 서버에 못 닿으면 원문(한국어)을 그대로 둔다 */ }
-      chunk.forEach((src, j) => pending.get(src).forEach((resolve) => resolve(out[j] || src)));
-    }
-  }
-
-  // 여러 줄 글은 줄마다 따로 번역해 줄바꿈을 그대로 살린다
-  function translateText(text) {
-    const src = String(text == null ? '' : text);
-    if (lang === 'ko' || !HANGUL.test(src)) return Promise.resolve(src);
-    return Promise.all(src.split('\n').map((line) => {
-      const trimmed = line.trim();
-      return trimmed ? requestLine(trimmed) : Promise.resolve('');
-    })).then((lines) => lines.join('\n'));
-  }
-
-  // 화면에 이미 그려진 요소의 글자를 자동 번역으로 바꾼다
-  function translateElements(elements) {
-    if (lang === 'ko') return;
-    Array.from(elements || []).forEach((el) => {
-      if (!el) return;
-      const src = el.dataset.mtSrc != null ? el.dataset.mtSrc : el.textContent;
-      if (!HANGUL.test(src)) return;
-      el.dataset.mtSrc = src;
-      translateText(src).then((out) => {
-        if (el.dataset.mtSrc === src) el.textContent = out;
-      });
-    });
-  }
-
   // ---------- 언어 선택 버튼 ----------
   function setLang(next) {
     if (!LANGS.includes(next)) return;
@@ -492,12 +425,12 @@
     });
   }
 
-  window.I18N = { lang, locale: LOCALE, t, translateText, translateElements };
+  window.I18N = { lang, locale: LOCALE, t };
 
   bindSwitchers();
   if (lang !== 'ko') {
     applyStatic(document);
-    document.querySelectorAll('.mt-note').forEach((el) => { el.hidden = false; });
+    document.querySelectorAll('.i18n-only').forEach((el) => { el.hidden = false; });
   }
   document.documentElement.classList.remove('i18n-pending');
 })();

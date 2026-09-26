@@ -472,9 +472,21 @@ html.i18n-pending body { visibility: hidden; }
 .lang-menu button[aria-current="true"] { color: var(--color-wine); font-weight: 700; }
 .lang-menu button[aria-current="true"]::after { content: " ✓"; }
 
-.mt-note { font-size: 12px; line-height: 1.5; color: var(--color-ink-soft); margin: 0; }
-.lang-menu .mt-note { padding: 8px 12px 4px; margin-top: 4px; border-top: 1px solid var(--color-line); }
-.mt-note--section { font-size: 13px; margin-top: 6px; }
+/* 본문은 한국어 기준으로 "띄어쓰기에서만 줄바꿈"(keep-all)이라, 띄어쓰기가 없는 일본어·중국어는
+   문장 전체가 한 단어로 취급돼 화면 밖으로 삐져나간다 → 이 두 언어는 글자 단위 줄바꿈을 허용한다 */
+html[lang="ja"] body,
+html[lang^="zh"] body { word-break: normal; overflow-wrap: anywhere; }
+
+/* 외국어 이름은 길어서 잘리지 않게 두 줄까지 허용 */
+html:not([lang="ko"]) .pastor-list .pname { white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.35; }
+
+/* 외국어 화면에만 보이는 안내 문구 (공지는 한국어로만 올라감, 미사시간 변경 가능 등) */
+.i18n-note { font-size: 13px; line-height: 1.55; color: var(--color-ink-soft); margin: 6px 0 0; }
+.hero .hero-mass-note { max-width: none; margin: 14px 0 0; padding-top: 12px; border-top: 1px solid var(--color-line); font-size: 13.5px; line-height: 1.55; color: var(--color-ink-soft); }
+
+/* 오늘의 말씀(축일·복음 구절)은 매일 한국어로 갱신되므로, 외국어 화면에서는 날짜·전례색·미사 버튼만 보여준다 */
+html:not([lang="ko"]) .liturgy-text { display: none; }
+html:not([lang="ko"]) .liturgy-cta { margin-left: auto; align-self: center; }
 
 .nav-menu-bell-item { gap: 8px; }
 .lang-switch--mobile .lang-btn { width: 40px; padding: 0; }
@@ -1703,7 +1715,6 @@ tr:last-child td { border-bottom: none; }
   flex: 0 1 auto;
   min-width: 0;
   margin-top: 0;
-  justify-content: center;
 }
 
 .route-card .stat-strip {
@@ -1719,37 +1730,40 @@ tr:last-child td { border-bottom: none; }
     align-items: stretch;
     gap: 16px;
   }
-  .route-card .route-steps { justify-content: flex-start; }
 }
 
+/* 경로는 옆으로 밀어야 보이는 한 줄 대신 줄바꿈해서 전부 보이게 한다
+   (가운데 정렬 + 한 줄이면 태블릿·PC에서 앞부분이 잘려 안 보였고, 영어처럼 긴 문구는 화면 밖으로 나갔다) */
 .route-steps {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px 6px;
   margin-top: 12px;
   font-size: 13.5px;
   color: var(--color-ink-soft);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
 }
-
-.route-steps::-webkit-scrollbar { display: none; }
 
 .route-steps .step {
-  flex-shrink: 0;
   background: var(--color-ivory-deep);
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: 14px;
   font-weight: 600;
-  white-space: nowrap;
+  text-align: center;
 }
 
-.route-steps .arrow { flex-shrink: 0; }
+.route-steps .arrow { flex-shrink: 0; color: var(--color-line); font-weight: 700; }
 
-.route-steps .arrow { color: var(--color-line); font-weight: 700; }
+/* 휴대폰·태블릿, 그리고 문구가 긴 외국어 화면은 위에서 아래로 한 단계씩 (→ 대신 ↓ 방향).
+   한국어 PC는 한 줄에 다 들어가므로 기존 가로 배치를 유지한다. */
+@media (max-width: 860px) {
+  .route-steps { flex-direction: column; align-items: stretch; gap: 4px; }
+  .route-steps .arrow { align-self: center; transform: rotate(90deg); line-height: 1; }
+}
+html:not([lang="ko"]) .route-steps { flex-direction: column; align-items: stretch; gap: 4px; }
+html:not([lang="ko"]) .route-steps .arrow { align-self: center; transform: rotate(90deg); line-height: 1; }
+html:not([lang="ko"]) .route-card .route-steps { flex: 0 1 460px; }
 
 /* ---------- 홈페이지 QR코드 ---------- */
 .qr-card {
@@ -2714,3 +2728,5 @@ tr:last-child td { border-bottom: none; }
   .lightbox { padding: 12px; }
   .lb-nav { width: 42px; height: 42px; font-size: 28px; }
 }
+
+.nowrap { white-space: nowrap; }

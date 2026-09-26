@@ -4,8 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const I18N = window.I18N || {
     lang: "ko",
     t: (key, ko, vars) => (vars ? ko.replace(/\{(\w+)\}/g, (_, k) => vars[k]) : ko),
-    translateText: (s) => Promise.resolve(s),
-    translateElements: () => {},
   };
   const t = I18N.t;
 
@@ -119,10 +117,9 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="notice-body"><div class="notice-body-inner"></div></div>
           </div>
         `).join("");
-        // 본문은 줄바꿈을 CSS(white-space: pre-line)로 살리고 글자로만 넣는다 — 자동 번역도 줄 단위로 된다
+        // 본문 줄바꿈은 CSS(white-space: pre-line)로 살린다
         noticeList.querySelectorAll(".notice-body-inner").forEach((el, i) => { el.textContent = items[i].body || ""; });
         bindNoticeAccordions(noticeList);
-        I18N.translateElements(noticeList.querySelectorAll(".notice-tag, .notice-title, .notice-body-inner"));
       })
       .catch(() => {});
   }
@@ -166,9 +163,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <button class="btn btn--primary" type="button" id="bulletinLatestBtn">${escapeHtml(t("bulletin_view", "주보 보기"))}</button>
           `;
           const btn = document.getElementById("bulletinLatestBtn");
-          if (btn) btn.addEventListener("click", () => openBulletin(latest));
-          I18N.translateElements(latestEl.querySelectorAll("h3"));
-        }
+          if (btn) btn.addEventListener("click", () => openBulletin(latest));        }
 
         function renderYearTabs() {
           yearTabsEl.innerHTML = "";
@@ -208,9 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.addEventListener("click", () => openBulletin(item));
             li.appendChild(btn);
             weekListEl.appendChild(li);
-          });
-          I18N.translateElements(weekListEl.querySelectorAll(".wtitle"));
-        }
+          });        }
 
         function openBulletin(item) {
           const lightbox = document.getElementById("lightbox");
@@ -237,9 +230,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           const pagesNote = images.length > 1 ? t("bulletin_pages", " ({n}면, 아래로 넘겨 보세요)", { n: images.length }) : "";
           lightboxCap.textContent = `${item.date || ""} · ${item.title || ""}` + pagesNote;
-          I18N.translateText(item.title || "").then((title) => {
-            lightboxCap.textContent = `${item.date || ""} · ${title}` + pagesNote;
-          });
           lightbox.classList.add("open");
         }
 
@@ -294,12 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
     viewer.index = Math.max(0, Math.min(startIndex || 0, viewer.photos.length - 1));
     viewer.caption = `${album.date || ""} · ${album.titleMain || ""}`;
     renderViewer();
-    lightbox.classList.add("open");
-    I18N.translateText(album.titleMain || "").then((title) => {
-      viewer.caption = `${album.date || ""} · ${title}`;
-      if (lightbox.classList.contains("open") && lightboxImg.classList.contains("lightbox-img--viewer")) renderViewer();
-    });
-  }
+    lightbox.classList.add("open");  }
   if (lightbox && lightboxImg && lightboxCap) {
     const closeBtn = document.getElementById("lightboxClose");
     if (closeBtn) closeBtn.addEventListener("click", () => lightbox.classList.remove("open"));
@@ -417,9 +402,7 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
             btn.addEventListener("click", () => openAlbum(album, 0));
             grid.appendChild(btn);
-          });
-          I18N.translateElements(grid.querySelectorAll(".gallery-cap-title, .gallery-cap-extra"));
-          renderPagination(totalPages);
+          });          renderPagination(totalPages);
         }
 
         function renderPagination(totalPages) {
